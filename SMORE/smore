@@ -1,0 +1,1064 @@
+#!/usr/bin/perl -w
+## wrapper for smore tool
+
+use Data::Dumper;
+use strict;
+use warnings;
+use Getopt::Long qw(GetOptions);
+use POSIX qw(strftime);
+use File::Basename;
+use File::Find;
+
+##general information
+my $toolname = "SMORE : Synteny Modulator Of Repetitive Elements";
+my $version = "1.0";
+my $citation ="
+SMORE: Synteny Modulator Of Repetitive Elements. 
+Berkemer, S.J. and Hoffmann, A. and Murray, C.R. and Stadler, P.F.
+MDPI Life, 2017 (submitted)";
+my $contact = "bsarah at bioinf dot uni-leipzig dot de or anneh at bioinf dot uni-leipzig dot de";
+
+my $mode = "";
+##program mode
+$mode = shift;
+##general options
+my $help;
+my $cont;
+my $vers;
+my $cit;
+my $helpout;
+##options for all modes
+my $toolpath;
+my $outpath;
+my $pythonpath;
+my $perlpath;
+##options for prep
+my $refspecies;
+my $genomes;
+my $mafs;
+my $trnas;
+my $cmfile;
+my $genelist;
+my $locilist;
+my $perc;
+my $evalin="0.01";
+my $bitvalin;
+my $infernalpath;
+my $trnaspath;
+my $pseudoscore;
+##options for toast and bake
+my $pathtocam; #path to output of smore prep (genes folder)
+my $seqsim =0.8;
+my $strucsim =0.8;
+my $newicktree;
+my $ids;
+my $joinmode = "relaxed";
+my $skipm;
+##options for verbose
+my $printall;
+my $printg;
+my $printa;
+my $printc;
+#option for mix
+my $maxclusnum=50000;
+#options for roast
+my $specieslist;
+my $cluslistpath;
+my $mixout;
+my $roastout;
+
+GetOptions(
+#general
+    'help|h' => \$help,
+    'version|v' => \$vers,
+    'citation' => \$cit,
+    'contact' => \$cont,
+    'helpout' => \$helpout,
+#all modes
+    'tool|t=s' => \$toolpath,
+    'out|o=s' => \$outpath,
+    'python=s' => \$pythonpath,
+    'perl=s' => \$perlpath,
+##options for prep
+    'ref|r=s' => \$refspecies,
+    'genomes|g=s' => \$genomes,
+    'maf|m=s' => \$mafs,
+    'trna' => \$trnas,
+    'trnascan=s' => \$trnaspath,
+    'cm|c=s' => \$cmfile,
+    'genes=s' => \$genelist,
+    'loci=s' => \$locilist,
+    'filter=s' => \$perc,
+    'incE=s' => \$evalin,
+    'incT=s' => \$bitvalin,
+    'infernal=s' => \$infernalpath,
+    'pseudo=s' => \$pseudoscore,
+##options for toast and bake
+    'prep=s' => \$pathtocam, #path to output of smore prep (genes folder)
+    'seqsim|s=s' => \$seqsim,
+    'strucsim|p=s' => \$strucsim,
+    'newick=s' => \$newicktree,
+    'id=s' => \$ids,
+    'join=s' => \$joinmode,
+    'nomiss' => \$skipm,
+##options for verbose
+    'verbose' => \$printall,
+    'graph' => \$printg,
+    'aln' => \$printa,
+    'clus' => \$printc,
+##for mix
+    'max=s' => \$maxclusnum,
+#for roast
+    'species=s' => \$specieslist,
+    'in|i=s' => \$cluslistpath,
+#for eat
+    'mix=s' => \$mixout,
+    'roast=s' => \$roastout
+    ) or die HelpShort();
+
+
+if($help && $mode eq "bake"){HelpBake(); exit 0;}
+if($help && $mode eq "prep"){HelpPrep(); exit 0;}
+if($help && $mode eq "toast"){HelpToast(); exit 0;}
+if($help && $mode eq "mix"){HelpMix(); exit 0;}
+if($help && $mode eq "roast"){HelpRoast(); exit 0;}
+if($help && $mode eq "eat"){HelpEat(); exit 0;}
+
+
+my $doexit = 0;
+if(! $mode){HelpShort(); exit 0;}
+if($mode eq "help" || $mode eq "Help" ||
+   $mode eq "--help" || $mode eq "-h" ||
+   $mode eq "Recipe" || $mode eq "recipe")
+{HelpComplete();exit 0;}
+
+
+##Help
+if ($help){HelpComplete();exit 0;}
+##Version
+if($mode eq "--version" || $mode eq "-v" || $vers){print "Program version $version \n"; $doexit = 1;}
+##Contact
+if($mode eq "--contact" || $cont){print "If you have further questions, please contact $contact \n"; $doexit = 1;}
+##Citation
+if($mode eq "--citation" || $cit){print "If you use this program, please cite: $citation \n"; $doexit = 1;}
+if($mode eq "--helpout" || $helpout ){HelpOut(); $doexit = 1;}
+
+
+if($doexit == 1){exit 0;}
+
+my $summary = "$outpath\/Summary\.txt";
+open(my $outs,">>",$summary);
+
+my $start_string = strftime "%a %b %e %H:%M:%S %Y", localtime;
+print $outs "$start_string -- Program started \n";
+
+my $parastr = "";
+##parameters always needed
+##tool
+if(!$toolpath){
+    my $tpcmd = "pwd";
+    my @tpcmdout = readpipe("$tpcmd");
+    $toolpath = $tpcmdout[0];
+}
+if(-e $toolpath){}
+else{print STDERR "Please specify the path to where the tool's files are located.\n"; exit 0;}
+$parastr = "$parastr --tool $toolpath";
+##outfolder
+if(!$outpath){print STDERR "Please specify a location for the output files.\n"; exit 0;}
+else{$parastr = "$parastr --out $outpath";}
+#create outfolder if it doesnt exist
+if(-e $outpath){}
+else{
+    my $cmd42= "mkdir $outpath";
+    my @out42 = readpipe("$cmd42");
+}
+##perl
+if(!$perlpath){
+    my $pepcmd = "which perl";
+    my @pepcmdout = readpipe("$pepcmd");
+    $perlpath = $pepcmdout[0];
+}
+if(-e $perlpath){}
+else{print STDERR "Please specify the path to perl.\n";  exit 0;}
+$parastr = "$parastr --perl $perlpath";
+##python
+if(!$pythonpath){
+    my $pypcmd = "which python3";
+    my @pypcmdout = readpipe("$pypcmd");
+    $pythonpath = $pypcmdout[0];
+}
+if(-e $pythonpath){}
+else{print STDERR "Please specify the path to python.\n";  exit 0;}
+$parastr = "$parastr --perl $perlpath";
+##refspecies
+if(!$refspecies){print STDERR "Please specify the name of the reference species as given in the maf/MultiZ files.\n";  exit 0;}
+else{$parastr = "$parastr --ref $refspecies";}
+
+######################################bake mode###############################
+if($mode eq "bake" || $mode eq "Bake"){
+##call prep and toast
+
+
+}
+
+######################################prep mode###############################
+elsif($mode eq "prep" || $mode eq "Prep")
+{
+    print $outs "in prep mode.\n";
+    ##maf
+    if(!$mafs){print STDERR "Please specify a location for the maf/MultiZ files.\n";  exit 0;}
+    else{$parastr = "$parastr --maf $mafs";}
+    my $filstr = "";
+    ##filter
+    if($perc){$filstr = " --filter $perc";}
+    $parastr = "$parastr$filstr";
+    my $preperrors = "$outpath\/errors_smoreprep\.txt";
+    ##cm
+    if($cmfile){
+	$parastr = "$parastr --cm $cmfile";
+	#we need genomes, infernalpath, (pseudoscore), (infernaloptions)
+	if(!$genomes){print STDERR "Please specify the path to where the genomes are located.\n";  exit 0;}
+	else{$parastr = "$parastr --genomes $genomes";}
+	if(!$infernalpath){
+            my $cmscmd = "which cmsearch";
+            my @cmscmdout = readpipe("$cmscmd");
+            my $infernalpath = $cmscmdout[0];
+        }
+        if(-e $infernalpath){}
+        else{print STDERR "Please specify the path to infernal.\n";  exit 0;}
+	$parastr = "$parastr --infernal $infernalpath";
+	my $infe = "";
+	my $inft = "";
+	if($evalin){$infe = " --incE $evalin";}
+	if(!$evalin && $bitvalin){$inft = " --incT $bitvalin";}
+	$parastr = "$parastr$infe$inft";
+	print $outs "using a CM file with parameter: $parastr\n";
+	##call prep script
+	my $prepcm = "$perlpath\/perl $toolpath\/smoreprep.pl --tool $toolpath --out $outpath --python $pythonpath --perl $perlpath --maf $mafs --ref $refspecies --cm $cmfile --genomes $genomes --infernal $infernalpath $infe $inft $filstr --err $preperrors 2>> $preperrors";
+	my @outprepcm = readpipe("$prepcm");
+	print $outs (join("",@outprepcm));
+	print $outs "\n";
+	if($pseudoscore){
+	    #an extra script to change the output format of genes file
+	    print STDERR "Reminder, there is another script missing!\n";
+	}
+    }
+    elsif($genelist){
+        #genelist
+	$parastr = "$parastr --genes $genelist";
+	print $outs "using a genelist with parameter: $parastr\n";
+	#nothing more needed
+	my $prepgl = "$perlpath\/perl $toolpath\/smoreprep.pl --tool $toolpath --out $outpath --python $pythonpath --perl $perlpath --maf $mafs --ref $refspecies --genes $genelist $filstr 2>> $preperrors";
+	my @outprepgl = readpipe("$prepgl");
+	print $outs (join("",@outprepgl));
+	print $outs "\n";
+    }
+    elsif($locilist){
+        #locilist
+	$parastr = "$parastr --loci $locilist";
+	if(!$genomes){print STDERR "Please specify the path to where the genomes are located.\n";  exit 0;}
+	else{$parastr = "$parastr --genomes $genomes";}
+	print $outs "using a locilist with parameter: $parastr\n";
+	#we need: genomes
+	#an extra script to create the input file
+	print STDERR "locilist option needs a further script. afterwards, it is the same as the genelist option!\n";
+    }
+    elsif($trnas){
+        #trnascan
+	if(!$trnaspath){
+            my $trnascmd = "which tRNAscan-SE";
+            my @trnascmdout = readpipe("$trnascmd");
+            my $trnaspath = $trnascmdout[0];
+        }
+        if(-e $trnaspath){}
+        else{print STDERR "Please specify the path to tRNAscan-SE.\n";  exit 0;}
+	$parastr = "$parastr --trna --trnascan $trnaspath";
+        print STDERR "trnascan option needs to be added!\n";
+    }
+    else{print STDERR "Please one of the following options when in prep mode: cm, genes or loci.\n";  exit 0;}
+
+    print $outs "Output files of smoreprep can be found here: $outpath \n";
+    print $outs "Please specify this path in the --prep option when running smoretoast or smorebake. \n";
+    print $outs "For more information on smoreprep output, please check the manual.\n";
+    my $stop_prep = strftime "%a %b %e %H:%M:%S %Y", localtime;
+    print $outs "$stop_prep -- Program finished \n";
+}
+
+######################################toast mode###############################
+elsif($mode eq "toast" || $mode eq "Toast")
+{
+    print $outs "in toast mode.\n";
+    my $toasterrors = "$outpath\/errors_smoretoast\.txt";
+    #prep output
+    if(!$pathtocam){print STDERR "Please specify the location of the output folders by smore prep.\n";  exit 0;}
+    else{$parastr = "$parastr --prep $pathtocam";}
+    my $specieslist = "$outpath\/specieslist";
+    my $gencmd = "ls  $pathtocam\/genes \> $specieslist";
+    my @outgncmd = readpipe("$gencmd");
+    #tree
+    if(!$newicktree){print STDERR "Please specify a newick tree representing the species' evolutionary relationship. \n";  exit 0;}
+    else{$parastr = "$parastr --newick $newicktree";}
+    my $formtree = "$outpath\/tree_formatted.newick";
+    if($ids){
+	#only convert tree identifier if id file is given
+	my $formcmd = "$perlpath\/perl $toolpath\/extendTree.pl $newicktree $ids $formtree 2>> $toasterrors";
+	my @formout = readpipe("$formcmd");
+    }
+    else{$formtree = $newicktree;}
+    #check tree
+    my $checkcmd1 = "$perlpath\/perl $toolpath\/checkTree.pl $formtree $specieslist 2>> $toasterrors";
+    my @checkout1 = readpipe("$checkcmd1");
+    my $noneout = "none";
+    if(index($checkout1[0],$noneout) != -1){print $outs "Tree file consistent with genomes!\n";}
+    else{
+        print STDERR "The following speciesidentifier do appear in the genomes but do not appear in the tree: $checkout1[0]\n"; exit 0;
+    }
+    #join
+    if($joinmode eq "relaxed" || $joinmode eq "strict" || $joinmode eq "none"){$parastr = "$parastr --join $joinmode";}
+    else{print STDERR "Specify a valid option for the mode of joining. \n";  exit 0;}
+    #output prints
+    my $checkformissing = "";
+    if($skipm){$checkformissing = " --nomiss";}
+    $parastr = "$parastr$checkformissing";
+    my $verbstr = "";
+    if($printall){$verbstr = " --verbose";}
+    else{
+	if($printg){$verbstr = "$verbstr --graph";}
+	if($printc){$verbstr = "$verbstr --clus";}
+	if($printa){$verbstr = "$verbstr --aln";}
+    }
+    $parastr = "$parastr$verbstr";
+    print $outs "with parameter: $parastr\n";
+    my $toastcmd = "$perlpath\/perl $toolpath\/smoretoast.pl --tool $toolpath --out $outpath --python $pythonpath --perl $perlpath --prep $pathtocam --seqsim $seqsim --strucsim $strucsim --newick $formtree --join $joinmode --species $specieslist$checkformissing --err $toasterrors $verbstr 2>> $toasterrors";
+    my @outtoast = readpipe("$toastcmd");
+    print $outs (join("",@outtoast));
+    print $outs "\n";
+    print $outs "Output files of smoretoast can be found here: $outpath \n";
+    print $outs "The final tree can be visualized using the online tool iTOL. Files to be uploaded on the iTOL page are located in $outpath\/data_iTOL\n";
+    print $outs "For more information on smoretoast output, use 'smore --helpout' or check the manual.\n";
+    my $stop_toast = strftime "%a %b %e %H:%M:%S %Y", localtime;
+    print $outs "$stop_toast -- Program finished \n";
+}
+######################################mix mode###############################
+elsif($mode eq "mix" || $mode eq "Mix"){
+    print $outs "in mix mode.\n";
+    ##mix parameter: 
+    my $mixerrors = "$outpath\/errors_smoremix\.txt";
+    #prep output
+    if(!$pathtocam){print STDERR "Please specify the location of the output folders by smore prep.\n";  exit 0;}
+    else{$parastr = "$parastr --prep $pathtocam";}
+    my $specieslist = "$outpath\/specieslist";
+    my $gencmd = "ls  $pathtocam\/genes \> $specieslist";
+    my @outgncmd = readpipe("$gencmd");
+    #join
+    if($joinmode eq "relaxed" || $joinmode eq "strict" || $joinmode eq "none"){$parastr = "$parastr --join $joinmode";}
+    else{print STDERR "Specify a valid option for the mode of joining. \n";  exit 0;}
+    #output prints
+    my $checkformissing = "";
+    if($skipm){$checkformissing = " --nomiss";}
+    $parastr = "$parastr$checkformissing";
+    my $verbstr="";
+    if($printc || $printall){$verbstr = "$verbstr --clus";}
+    #tree
+    if(!$newicktree){print STDERR "Please specify a newick tree representing the species' evolutionary relationship. \n";  exit 0;}
+    else{$parastr = "$parastr --newick $newicktree";}
+    my $formtree = "$outpath\/tree_formatted.newick";
+    if($ids){
+	#only convert tree identifier if id file is given
+	my $formcmd = "$perlpath\/perl $toolpath\/extendTree.pl $newicktree $ids $formtree 2>> $mixerrors";
+	my @formout = readpipe("$formcmd");
+    }
+    else{$formtree = $newicktree;}
+    #check tree
+    my $checkcmd1 = "$perlpath\/perl $toolpath\/checkTree.pl $formtree $specieslist 2>> $mixerrors";
+    my @checkout1 = readpipe("$checkcmd1");
+    my $noneout = "none";
+    if(index($checkout1[0],$noneout) != -1){print $outs "Tree file consistent with genomes!\n";}
+    else{
+        print STDERR "The following speciesidentifier do appear in the genomes but do not appear in the tree: $checkout1[0]\n"; exit 0;
+    }
+##change to mix mode
+    print $outs "with parameter: $parastr\n";
+    my $mixcmd = "$perlpath\/perl $toolpath\/smoremix.pl --tool $toolpath --out $outpath --python $pythonpath --perl $perlpath --prep $pathtocam --seqsim $seqsim --strucsim $strucsim --newick $formtree --join $joinmode --species $specieslist$checkformissing --err $mixerrors $verbstr --max $maxclusnum 2>> $mixerrors";
+    my @outmix = readpipe("$mixcmd");
+    print $outs (join("",@outmix));
+    print $outs "\n";
+    print $outs "Output files of smoremix can be found here: $outpath \n";
+    print $outs "List of commands to further process smoremix output can be found in $outpath\/commandlist.txt.\n";
+    print $outs "For more information on smoremix output, use 'smore --helpout' or 'smore --help' or check the manual.\n";
+    my $stop_mix = strftime "%a %b %e %H:%M:%S %Y", localtime;
+    print $outs "$stop_mix -- Program finished \n";
+}
+######################################roast mode###############################
+elsif($mode eq "roast" || $mode eq "Roast"){
+
+    print $outs "in roast mode.\n";
+    #prep output
+    if(! $cluslistpath){print STDERR "Please specify the list of clusters to be analysed with smoreroast.\n"; exit 0;}
+    else{$parastr = "$parastr --in $cluslistpath";}
+    #species
+    if(! $specieslist){print STDERR "Please specify the list of species.\n"; exit 0;}
+    else{$parastr = "$parastr --species $specieslist";}
+    #tree
+    if(!$newicktree){print STDERR "Please specify a newick tree representing the species' evolutionary relationship. \n";  exit 0;}
+    else{$parastr = "$parastr --newick $newicktree";}
+    my $formtree = "$outpath\/tree_formatted.newick";
+    if($ids){
+	#only convert tree identifier if id file is given
+	my $formcmd = "$perlpath\/perl $toolpath\/extendTree.pl $newicktree $ids $formtree";
+	my @formout = readpipe("$formcmd");
+    }
+    else{$formtree = $newicktree;}
+    #check tree
+    my $checkcmd1 = "$perlpath\/perl $toolpath\/checkTree.pl $formtree $specieslist";
+    my @checkout1 = readpipe("$checkcmd1");
+    my $noneout = "none";
+    if(index($checkout1[0],$noneout) != -1){print $outs "Tree file consistent with genomes!\n";}
+    else{
+        print STDERR "The following speciesidentifier do appear in the genomes but do not appear in the tree: $checkout1[0]\n"; exit 0;
+    }
+    #output prints
+    my $checkformissing = "";
+    if($skipm){$checkformissing = " --nomiss";}
+    $parastr = "$parastr$checkformissing";
+    my $verbstr = "";
+    if($printall){$verbstr = " --verbose";}
+    else{
+	if($printg){$verbstr = "$verbstr --graph";}
+	if($printa){$verbstr = "$verbstr --aln";}
+    }
+    $parastr = "$parastr$verbstr";
+    print $outs "with parameter: $parastr\n";
+    my $roastcmd = "$perlpath\/perl $toolpath\/smoreroast.pl --tool $toolpath --out $outpath --python $pythonpath --perl $perlpath --in $cluslistpath --seqsim $seqsim --strucsim $strucsim --newick $formtree --species $specieslist$checkformissing $verbstr";
+    my @outroast = readpipe("$roastcmd");
+    print $outs (join("",@outroast));
+    print $outs "\n";
+    print $outs "Output files of smoreroast can be found here: $outpath \n";
+    print $outs "To summarize all output files and finish the analysis, please use 'smore eat'.\n";
+    print $outs "For more information on smoreroast and smoreeat, use 'smore --help' or 'smore --helpout' or check the manual.\n";
+    my $stop_roast = strftime "%a %b %e %H:%M:%S %Y", localtime;
+    print $outs "$stop_roast -- Program finished \n";
+}
+######################################eat mode###############################
+elsif($mode eq "eat" || $mode eq "Eat"){
+    my $eaterrors = "$outpath\/errors_smoreeat\.txt";
+    if(!$pathtocam){print STDERR "Please specify the location of the output folders by smore prep.\n";  exit 0;}
+    else{$parastr = "$parastr --prep $pathtocam";}
+    if(!$mixout){print STDERR "Please specify the location of the output folders by smore mix.\n";  exit 0;}
+    else{$parastr = "$parastr --mix $mixout";}
+    if(!$roastout){print STDERR "Please specify the location of the output folders by smore roast.\n";  exit 0;}
+    else{$parastr = "$parastr --roast $roastout";}
+    if(!$newicktree){print STDERR "Please specify a newick tree representing the species' evolutionary relationship. \n";  exit 0;}
+    else{$parastr = "$parastr --newick $newicktree";}
+    my $formtree = "$outpath\/tree_formatted.newick";
+    if($ids){
+	#only convert tree identifier if id file is given
+	my $formcmd = "$perlpath\/perl $toolpath\/extendTree.pl $newicktree $ids $formtree 2>> $eaterrors";
+	my @formout = readpipe("$formcmd");
+    }
+    else{$formtree = $newicktree;}
+    #check tree
+    my $checkcmd1 = "$perlpath\/perl $toolpath\/checkTree.pl $formtree $specieslist 2>> $eaterrors";
+    my @checkout1 = readpipe("$checkcmd1");
+    my $noneout = "none";
+    if(index($checkout1[0],$noneout) != -1){print $outs "Tree file consistent with genomes!\n";}
+    else{
+        print STDERR "The following speciesidentifier do appear in the genomes but do not appear in the tree: $checkout1[0]\n"; exit 0;
+    }
+    #output prints
+    my $checkformissing = "";
+    if($skipm){$checkformissing = " --nomiss";}
+    $parastr = "$parastr$checkformissing";
+
+    print $outs "with parameter: $parastr\n";
+    my $eatcmd = "$perlpath\/perl $toolpath\/smoreeat.pl --tool $toolpath --out $outpath --python $pythonpath --perl $perlpath --prep $pathtocam --mix $mixout --roast $roastout --newick $formtree$checkformissing 2> $eaterrors";
+    my @outeat = readpipe("$eatcmd");
+    print $outs (join("",@outeat));
+    print $outs "\n";
+    print $outs "Output files of smore eat can be found here: $outpath \n";
+    print $outs "The final tree can be visualized using the online tool iTOL. Files to be uploaded on the iTOL page are located in $outpath\/data_iTOL\n";
+    print $outs "For more information on smore eat, use 'smore --help' or 'smore --helpout' or check the manual.\n";
+    my $stop_eat = strftime "%a %b %e %H:%M:%S %Y", localtime;
+    print $outs "$stop_eat -- Program finished \n";
+
+
+}
+######################################invalid mode###############################
+else{print "\'$mode\' is not a valid option! \n";  exit 0;}
+
+
+sub HelpShort{
+print "
+This is the short help page of the SMORE pipeline, a Synteny Modulator Of Repetitive Elements.
+usage: ./smore <subcommand> [options]
+
+or ./smore [general_options]
+
+The general options are:
+        --help|-h       print help page
+	--version|-v    print version information
+	--citation	print citation information
+	--contact       print contact information
+        --helpout       print explanation for structure and visualization of
+	                output files
+
+For more information about the subcommands use: smore <subcommand> --help
+More detailed information about the output can be found using: smore --helpout
+
+The smore subcommands are:
+
+    bake    The subcommand bake combines the subcommands prep and toast in
+            order to easily start and run the pipeline completely. Hence,
+	    parameters for bake are the same as the combined parameters
+	    for prep and toast.
+
+    prep    This program will sort genetic elements in between genomic anchors
+            based on MultiZ alignments. The genetic elements are
+            taken from a list given as input or retrieved based on a covariance
+	    model as input for infernal.
+
+    toast   This program will take the prep-output and calculate the numbers
+            for evolutionary events at the given phylogenetic tree.
+            For a more detailed insight, the verbose mode can be used to print
+            intermediary files such as clusters, graphs and/or alignments
+
+    mix     This subcommand can be used after running SMORE prep. SMORE mix
+            only produces a list of genetic clusters. This can be used to
+	    test different joining methods. Additionally, SMORE mix can split
+	    the number of clusters in several disjoint lists such that the
+	    succeeding subcommands can be run in parallel on the disjoint
+	    subsets to speed up running time of the program for large
+	    data sets. In case SMORE mix is splitting the list of clusters,
+	    it will output a command list that can be called to continue
+	    running the pipeline. The next subcommand to be called is
+	    SMORE roast.
+
+    roast   SMORE roast starts from a list of genetic clusters and will output
+            lists of genetic events that can be further proceeded as an input
+	    for SMORE eat. SMORE roast can be used for large data sets in order
+	    to split and parallelize the process. The next subcommand in the
+	    pipeline will be SMORE eat.
+
+    eat     This subcommand is used after SMORE roast and will take list(s) of
+            evolutionary events and output a phylogenetic tree with event and
+	    element counts. SMORE eat is able to summarize the outputs of parallelized
+	    runs such that all data is recombined at the phylogenetic tree.
+";
+
+
+}
+
+
+sub HelpComplete{
+print "
+This is the help page of the SMORE pipeline,
+Synteny Modulator Of Repetitive Elements.
+
+usage: ./smore <subcommand> [options]
+
+or ./smore [general_options]
+
+The general options are:
+        --help|-h       print help page
+	--version|-v    print version information
+	--citation	print citation information
+	--contact       print contact information
+        --helpout       print explanation for structure and visualization of
+	                output files
+
+For more information about the subcommands use: smore <subcommand> --help
+More detailed information about the output can be found using: smore --helpout
+
+The smore subcommands are:
+
+    bake    The subcommand bake combines the subcommands prep and toast in
+            order to easily start and run the pipeline completely. Hence,
+	    parameters for bake are the same as the combined parameters
+	    for prep and toast.
+
+    prep    This program will sort genetic elements in between genomic anchors
+            based on MultiZ alignments. The genetic elements are
+            taken from a list given as input or retrieved based on a covariance
+	    model as input for infernal.
+
+    toast   This program will take the prep-output and calculate the numbers
+            for evolutionary events at the given phylogenetic tree.
+            For a more detailed insight, the verbose mode can be used to print
+            intermediary files such as clusters, graphs and/or alignments
+
+    mix     This subcommand can be used after running SMORE prep. SMORE mix
+            only produces a list of genetic clusters. This can be used to
+	    test different joining methods. Additionally, SMORE mix can split
+	    the number of clusters in several disjoint lists such that the
+	    succeeding subcommands can be run in parallel on the disjoint
+	    subsets to speed up running time of the program for large
+	    data sets. In case SMORE mix is splitting the list of clusters,
+	    it will output a command list that can be called to continue
+	    running the pipeline. The next subcommand to be called is
+	    SMORE roast.
+
+    roast   SMORE roast starts from a list of genetic clusters and will output
+            lists of genetic events that can be further proceeded as an input
+	    for SMORE eat. SMORE roast can be used for large data sets in order
+	    to split and parallelize the process. The next subcommand in the
+	    pipeline will be SMORE eat.
+
+    eat     This subcommand is used after SMORE roast and will take list(s) of
+            evolutionary events and output a phylogenetic tree with event and
+	    element counts. SMORE eat is able to summarize the outputs of
+            parallelized runs such that all data is recombined at the
+            phylogenetic tree.
+";
+#HelpPrep();
+#HelpToast();
+#HelpOut();
+}
+
+
+
+sub HelpBake{
+print "
+The subcommand bake combines the subcommands prep and toast in
+order to easily start and run the pipeline completely. Hence,
+parameters for bake are the same as the combined parameters
+for prep and toast.
+
+For further details on the commands, please see 
+smore prep --help 
+and/or
+smore toast --help
+
+Usage: 
+smore bake --out PATH --ref REFSPECIES --maf PATH 
+           --newick FILE (--id FILE) 
+           (--filter NUM) 
+           (--tool PATH) (--python PATH) (--perl PATH)
+           (--seqsim NUM) (--strucsim NUM) (--join LEVEL) 
+           (--nomiss) 
+           (--verbose)
+           (--clus)
+           (--graph)
+           (--aln)
+
+with one of the following possibilities (a-d):
+
+a)       [--cm FILE --genomes PATH (--infernal PATH) 
+         (--incE NUM |--incT NUM) (--pseudo NUM)]
+b)       [--genes FILE ]
+c)       [--genomes PATH --loci FILE ]
+d)       [--trna (--trnascan PATH)]
+
+Legend:
+() optional parameter
+[] set of parameters that belong together
+| either the first or the second option 
+";
+}
+
+sub HelpPrep{
+print "
+This program will sort genetic elements in between genomic anchors
+based on MultiZ alignments. The genetic elements are
+taken from a list given as input or retrieved based on a covariance
+model as input for infernal.
+
+
+Usage: 
+smore prep --out PATH --ref REFSPECIES --maf PATH 
+           (--filter NUM) 
+           (--tool PATH) (--python PATH) (--perl PATH)
+
+with one of the following possibilities (a-d):
+
+a)       [--cm FILE --genomes PATH (--infernal PATH) 
+          (--incE NUM |--incT NUM) (--pseudo NUM)]
+b)       [--genes FILE ]
+c)       [--genomes PATH --loci FILE ]
+d)       [--trna (--trnascan PATH)]
+
+
+Legend:
+() optional parameter
+[] set of parameters that belong together
+| either the first or the second option 
+
+
+    #General options
+    --out|-o PATH      folder where to write the output files. If the folder
+                       does not exist, it will be created
+    --ref|-r ID        name of the reference species as given in MultiZ files
+    --maf|-m PATH      folder containing all MultiZ alignments. Files can be
+                       compressed.
+    --filter NUM       optional: remove a percentage of the lowest scoring
+	               blocks base on the MAF scores; between 0 and 100
+
+    ##CM mode
+    --cm|-c  FILE      covariance model file, input for infernal
+    --genomes|-g PATH  folder with genomes of the species used as an input
+                       to infernal to scan the genomes for genetic elements
+		       specified by the CM. Filenames should match species
+		       names in MultiZ files.
+    --incE NUM         optional parameter for infernal, e-value threshold
+    --incT NUM         optional parameter for infernal, bitscore threshold
+    --infernal PATH    optional, path to infernal installation if not installed
+                       in the path environment
+    --pseudo NUM       optional, bitscore threshold that defines pseudogenes
+
+    ##Genelist mode
+    --genes FILE       a list of genetic elements as input.
+	       	       Format (tab separated):
+			
+	               chromosome start_pos end_pos species strand type
+		       pseudogene sequence structure comment
+			
+		       -fields to be omitted are filled with NA
+		       -species name should be the same as in MultiZ files
+		       -type is optional (e.g. tRNA type Met)
+		       -pseudogene (optional): true or false
+		       -structure is optional, dot-bracket-notation
+		       -for optional sequence, take loci mode
+		       -comment is optional
+
+    ##Loci mode
+    --genomes|-g PATH  folder with genomes of the species used to retrieve
+		       the sequence of the genetic elements in the loci list
+		       based on their coordinates. Filenames should match
+		       species names in loci list files.
+    --loci FILE        list with genetic elements without sequence
+		       Format (tab separated):
+			
+		       chromosome start_pos end_pos species strand type
+		       pseudogene
+			
+		       -fields to be omitted are filled with NA
+		       -species name should be the same as in MultiZ files
+		       -type is optional (e.g. tRNA type Met)
+		       -pseudogene (optional): true or false
+
+    ##tRNAscan-SE mode
+    --trna             switch on mode that applies tRNAscan-SE on given genomes.
+    --genomes|-g PATH  folder with genomes of the species used to retrieve
+		       the sequence of the genetic elements in the loci list
+		       based on their coordinates. Filenames should match
+		       species names in loci list files.
+    --trnascan PATH    optional, installation path of tRNAscan-SE if not in 
+                       environment variable
+
+    #optional parameter for all subcommands
+    --tool|-t PATH      path to where the smore tool is located. Only needed,
+                        if the tool is located in a very specific location
+    --python PATH       path to python, onlz needed if python3 is not installed
+                        within the environment path variable
+    --perl PATH         path to perl, only needed if perl is not installed
+                        within the environment path variable
+
+
+";
+}
+
+
+sub HelpToast{
+print "
+This program will take the prep-output and calculate the numbers
+for evolutionary events at the given phylogenetic tree.
+Toast is the fast version, omitting all output files that are not
+necessarily needed. For a more detailed output, use --verbose or any combination
+of --clus, --graph, --aln. Please note that the verbose version might
+take significantly longer.
+
+Usage: 
+smore toast --out PATH --newick FILE (--id FILE)
+            (--seqsim NUM) (--strucsim NUM) (--join LEVEL) (--nomiss) 
+            (--verbose)
+            (--clus)
+            (--graph)
+            (--aln)
+            (--tool PATH) (--python PATH) (--perl PATH)
+
+Legend:
+() optional parameter
+[] set of parameters that belong together
+| either the first or the second option 
+
+
+    --out|-o PATH       folder where to write the output files. If the folder
+	                does not exist, it will be created
+    --prep PATH         folder with output from smore prep run
+    --seqsim|-s NUM     percentage of sequence similarity to be considered
+	                homolog sequences, default 0.8
+    --strucsim|-p NUM   percentage of structure similarity to be considered
+	                homolog sequences, default 0.8
+    --newick FILE       tree in newick format containing the species included
+	                in the output of smore prep.
+    --id FILE		in case the species' identifier do not fit, this file
+	 		can be used to automatically translate the names
+			Format (tab separated):
+			current_name_in_tree name_to_translate_to
+    --join LEVEL	the way of how original clusters should be joined,
+			either none, strict or relaxed; default: relaxed
+    --nomiss            do not check for missing anchors. in case of large
+                        clusters, using --nomiss will speed up the runtime
+    --verbose           print all intermediary files, thus clusters, graphs
+                        and duplication alignments
+    --clus              print only intermediary cluster files
+    --graph             print only intermediary graph files
+    --aln               print only intermediary duplication alignment files
+
+    #optional parameter for all subcommands
+    --tool|-t PATH      path to where the smore tool is located. Only needed,
+                        if the tool is located in a very specific location
+    --python PATH       path to python, onlz needed if python3 is not installed
+                        within the environment path variable
+    --perl PATH         path to perl, only needed if perl is not installed
+                        within the environment path variable
+";
+}
+
+sub HelpMix{
+print "
+This subcommand can be used after running SMORE prep. SMORE mix
+only produces a list of genetic clusters. This can be used to
+test different joining methods. Additionally, SMORE mix can split
+the number of clusters in several disjoint lists such that the
+succeeding subcommands can be run in parallel on the disjoint
+subsets to speed up running time of the program for large
+data sets. In case SMORE mix is splitting the list of clusters,
+it will output a command list that can be called to continue
+running the pipeline. The next subcommand to be called is
+SMORE roast.
+
+Usage: 
+smore toast --out PATH --prep PATH --species FILE
+            --newick FILE (--id FILE)
+            (--seqsim NUM) (--strucsim NUM) (--join LEVEL) (--nomiss) 
+	    (--max NUM)
+            (--verbose)
+            (--clus)
+            (--tool PATH) (--python PATH) (--perl PATH)
+
+Legend:
+() optional parameter
+[] set of parameters that belong together
+| either the first or the second option 
+
+    --out|-o PATH       folder where to write the output files. If the folder
+	                does not exist, it will be created
+    --prep PATH         folder with output from smore prep run
+    --species FILE      file listing all species one per line. Species
+                        identifier must be the same as in newick or id
+			and prep output data.
+    --newick FILE       tree in newick format containing the species included
+	                in the output of smore prep.
+    --id FILE		in case the species' identifier do not fit, this file
+	 		can be used to automatically translate the names
+			Format (tab separated):
+			current_name_in_tree name_to_translate_to
+    --seqsim|-s NUM     percentage of sequence similarity to be considered
+	                homolog sequences, default 0.8
+    --strucsim|-p NUM   percentage of structure similarity to be considered
+	                homolog sequences, default 0.8
+    --max NUM           maximal number of clusters to be included in the
+                        following steps of the analysis. In case there exist
+			more clusters, the program automatically splits the
+			data set and creates a command list for the following
+			steps of the pipeline. Default: 50000.
+    --join LEVEL	the way of how original clusters should be joined,
+			either none, strict or relaxed; default: relaxed
+    --nomiss            do not check for missing anchors. in case of large
+                        clusters, using --nomiss will speed up the runtime
+    --verbose           print all intermediary files, thus clusters
+    --clus              print only intermediary cluster files
+
+    #optional parameter for all subcommands
+    --tool|-t PATH      path to where the smore tool is located. Only needed,
+                        if the tool is located in a very specific location
+    --python PATH       path to python, onlz needed if python3 is not installed
+                        within the environment path variable
+    --perl PATH         path to perl, only needed if perl is not installed
+                        within the environment path variable
+";
+}
+
+sub HelpRoast{
+print "
+SMORE roast starts from a list of genetic clusters and will output
+lists of genetic events that can be further proceeded as an input
+for SMORE eat. SMORE roast can be used for large data sets in order
+to split and parallelize the process. The next subcommand in the
+pipeline will be SMORE eat.
+
+Usage: 
+smore toast --out PATH --in FILE --newick FILE (--id FILE)
+            (--seqsim NUM) (--strucsim NUM) (--nomiss) 
+            (--verbose)
+            (--graph)
+            (--aln)
+            (--tool PATH) (--python PATH) (--perl PATH)
+
+Legend:
+() optional parameter
+[] set of parameters that belong together
+| either the first or the second option 
+
+
+    --out|-o PATH       folder where to write the output files. If the folder
+	                does not exist, it will be created
+    --in|-i FILE        output file of smore mix containing a list of
+                        clusters
+    --species FILE      file listing all species one per line. Species
+                        identifier must be the same as in newick or id
+			and prep output data.
+    --newick FILE       tree in newick format containing the species included
+	                in the output of smore prep.
+    --id FILE		in case the species' identifier do not fit, this file
+	 		can be used to automatically translate the names
+			Format (tab separated):
+			current_name_in_tree name_to_translate_to
+    --seqsim|-s NUM     percentage of sequence similarity to be considered
+	                homolog sequences, default 0.8
+    --strucsim|-p NUM   percentage of structure similarity to be considered
+	                homolog sequences, default 0.8
+    --nomiss            do not check for missing anchors. in case of large
+                        clusters, using --nomiss will speed up the runtime
+    --verbose           print all intermediary files, thus clusters
+    --graph             print only intermediary graph files
+    --aln             print only intermediary duplication alignment files
+
+    #optional parameter for all subcommands
+    --tool|-t PATH      path to where the smore tool is located. Only needed,
+                        if the tool is located in a very specific location
+    --python PATH       path to python, onlz needed if python3 is not installed
+                        within the environment path variable
+    --perl PATH         path to perl, only needed if perl is not installed
+                        within the environment path variable
+";
+}
+
+sub HelpEat{
+print "
+This subcommand is used after SMORE roast and will take list(s) of
+evolutionary events and output a phylogenetic tree with event and
+element counts. SMORE eat is able to summarize the outputs of
+parallelized runs such that all data is recombined at the
+phylogenetic tree.
+
+Usage: 
+smore toast --out PATH --in FILE --newick FILE (--id FILE)
+            (--seqsim NUM) (--strucsim NUM) (--nomiss) 
+            (--verbose)
+            (--graph)
+            (--aln)
+            (--tool PATH) (--python PATH) (--perl PATH)
+
+Legend:
+() optional parameter
+[] set of parameters that belong together
+| either the first or the second option 
+
+
+    --out|-o PATH       folder where to write the output files. If the folder
+	                does not exist, it will be created
+    --prep PATH         output folder containing smore prep output
+    --mix PATH          output folder containing smore mix output
+    --roast PATH        output folder containing smore roast output
+    --newick FILE       tree in newick format containing the species included
+	                in the output of smore prep.
+    --id FILE		in case the species' identifier do not fit, this file
+	 		can be used to automatically translate the names
+			Format (tab separated):
+			current_name_in_tree name_to_translate_to
+    --nomiss            do not check for missing anchors. in case of large
+                        clusters, using --nomiss will speed up the runtime
+
+    #optional parameter for all subcommands
+    --tool|-t PATH      path to where the smore tool is located. Only needed,
+                        if the tool is located in a very specific location
+    --python PATH       path to python, onlz needed if python3 is not installed
+                        within the environment path variable
+    --perl PATH         path to perl, only needed if perl is not installed
+                        within the environment path variable
+";
+}
+
+
+
+
+sub HelpOut{
+print "
+General Output:
+    data_iTOL:   folder giving files that can be uploaded to itol.embl.de
+                 The file called F0tree.txt is uploaded at
+                 http://itol.embl.de/upload.cgi.
+                 The remaining files can be added using drag and drop
+                 into the browser window. This will result in a
+                 interactive visualization of the resulting tree.
+		 A legend is added automatically. All nodes in the tree will
+                 have unique names, thus some nodes might have names such as
+                 'innerNode0' because it was added automatically.
+
+    OutTree.txt: the resulting tree in newick format with numbers at the
+                 nodes given in brackets. This format can be used to
+                 visualize the tree with newick compatible programs.
+
+geneticEvents.txt: File listing all genetic events counted during the 
+                   analysis. The numbers are sorted by event and node of
+                   the tree. The file includes a event called 'Other'. This
+                   will give the difference of genetic elements between the
+                   total amount and the elements used in the analysis.
+                   For a successful run of the pipeline, the numbers should
+                   be 0.
+
+allClusters_original.txt 
+and allClusters_joined.txt: These two files contain lists of clusters
+                            showing which elements are contained together
+                            in one cluster before and after joining.
+
+*_errors: for each part of the smore pipeline, there is a file giving errors
+          that happened during the run. If no errors occured, the file is
+          empty.
+
+list_cographs.txt  and
+list_noncographs.txt: these files contain statistics about graphs that were
+                      cographs from the beginning or had to be edited in
+                      order to become a cograph. The tables list number of
+                      nodes, number of edges and density of the graphs.
+
+remoldings.txt and
+inremoldings.txt: These files contain genetic elements that (a) have
+                  highly similar sequences but different types or (b)
+                  have the same types but clearly distinct sequences.
+						
+allTypes.txt and
+allPseudoTypes.txt: These two files list the different types of genetic
+                    elements for all species and functional or pseudogenized
+                    genes. This can be used to analyse the distribution of
+                    different types of genetic elements.
+
+Additional files:
+- for each species, there are files listing their genetic elements as
+they were used as intermediate files.
+- there are files for each of the evolutionary events where counts are
+listed.
+- for singletons, there is also a listing about types and pseudogenes
+- for elements which could not be sorted in between genomic anchors (nones)
+there is listings about types and pseudogenes.
+
+Verbose output: the verbose options will output three additional files for
+each cluster, named with left and right anchor numbers to match all three
+files. They will be in three different folders: cluster, graph and
+duplication_alignment. The files contain the specific structures of the cluster in
+each step of the analysis and can be used to gain a deeper insight.
+
+smore mix output: the smore mix program will output a list of genetic clusters.
+In case the number of cluster is higher than the number set with --max option
+(default:50000), there will be several lists and a list of commands that can be
+used to call the following subcommand of the pipeline (smore roast).
+
+smore roast output: smore roast will output files that include counts for
+genetic events. Those files can be read by smore eat. If smore roast is called
+several times on different lists of clusters, smore eat will summarize the files
+and produce the output on the summarized counts.
+
+	    
+";
+}
