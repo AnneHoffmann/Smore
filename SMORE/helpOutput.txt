@@ -1,0 +1,76 @@
+This help page describes the output files of the SMORE pipeline.
+For more detailed information, we refer to the SMORE manual.
+
+#General Output:
+    data_iTOL:   folder giving files that can be uploaded to itol.embl.de
+                 The file called F0tree.txt is uploaded at
+                 http://itol.embl.de/upload.cgi.
+                 The remaining files can be added using drag and drop
+                 into the browser window. This will result in a
+                 interactive visualization of the resulting tree.
+		 A legend is added automatically. All nodes in the tree will
+                 have unique names, thus some nodes might have names such as
+                 'innerNode0' because it was added automatically.
+
+    OutTree.txt: the resulting tree in newick format with numbers at the
+                 nodes given in brackets. This format can be used to
+                 visualize the tree with newick compatible programs.
+
+geneticEvents.txt: File listing all genetic events counted during the 
+                   analysis. The numbers are sorted by event and node of
+                   the tree. The file includes a event called 'Other'. This
+                   will give the difference of genetic elements between the
+                   total amount and the elements used in the analysis.
+                   For a successful run of the pipeline, the numbers should
+                   be 0.
+
+allClusters_original.txt 
+and allClusters_joined.txt: These two files contain lists of clusters
+                            showing which elements are contained together
+                            in one cluster before and after joining.
+
+*_errors: for each part of the smore pipeline, there is a file giving errors
+          that happened during the run. If no errors occured, the file is
+          empty.
+
+list_cographs.txt  and
+list_noncographs.txt: these files contain statistics about graphs that were
+                      cographs from the beginning or had to be edited in
+                      order to become a cograph. The tables list number of
+                      nodes, number of edges and density of the graphs.
+
+remoldings.txt and
+inremoldings.txt: These files contain genetic elements that (a) have
+                  highly similar sequences but different types or (b)
+                  have the same types but clearly distinct sequences.
+						
+allTypes.txt and
+allPseudoTypes.txt: These two files list the different types of genetic
+                    elements for all species and functional or pseudogenized
+                    genes. This can be used to analyse the distribution of
+                    different types of genetic elements.
+
+Additional files:
+- for each species, there are files listing their genetic elements as
+they were used as intermediate files.
+- there are files for each of the evolutionary events where counts are
+listed.
+- for singletons, there is also a listing about types and pseudogenes
+- for elements which could not be sorted in between genomic anchors (nones)
+there is listings about types and pseudogenes.
+
+Verbose output: the verbose options will output three additional files for
+each cluster, named with left and right anchor numbers to match all three
+files. They will be in three different folders: cluster, graph and
+duplication_alignment. The files contain the specific structures of the cluster in
+each step of the analysis and can be used to gain a deeper insight.
+
+smore mix output: the smore mix program will output a list of genetic clusters.
+In case the number of cluster is higher than the number set with --max option
+(default:50000), there will be several lists and a list of commands that can be
+used to call the following subcommand of the pipeline (smore roast).
+
+smore roast output: smore roast will output files that include counts for
+genetic events. Those files can be read by smore eat. If smore roast is called
+several times on different lists of clusters, smore eat will summarize the files
+and produce the output on the summarized counts.

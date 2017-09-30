@@ -1,0 +1,52 @@
+This subcommand will take the prep-output and calculate the numbers
+for evolutionary events at the given phylogenetic tree.
+Toast is the fast version, omitting all output files that are not
+necessarily needed. For a more detailed output, use --verbose or any combination
+of --clus, --graph, --aln. Please note that the verbose version might
+take significantly longer.
+
+Usage: 
+smore toast --out PATH --newick FILE (--id FILE)
+            (--seqsim NUM) (--strucsim NUM) (--join LEVEL) (--nomiss) 
+            (--verbose)
+            (--clus)
+            (--graph)
+            (--aln)
+            (--tool PATH) (--python PATH) (--perl PATH)
+
+Legend:
+() optional parameter
+[] set of parameters that belong together
+| either the first or the second option 
+
+
+    --out|-o PATH       folder where to write the output files. If the folder
+	                does not exist, it will be created
+    --prep PATH         folder with output from smore prep run
+    --seqsim|-s NUM     percentage of sequence similarity to be considered
+	                homolog sequences, default 0.8
+    --strucsim|-p NUM   percentage of structure similarity to be considered
+	                homolog sequences, default 0.8
+    --newick FILE       tree in newick format containing the species included
+	                in the output of smore prep.
+    --id FILE		in case the species' identifier do not fit, this file
+	 		can be used to automatically translate the names
+			Format (tab separated):
+			current_name_in_tree name_to_translate_to
+    --join LEVEL	the way of how original clusters should be joined,
+			either none, strict or relaxed; default: relaxed
+    --nomiss            do not check for missing anchors. in case of large
+                        clusters, using --nomiss will speed up the runtime
+    --verbose           print all intermediary files, thus clusters, graphs
+                        and duplication alignments
+    --clus              print only intermediary cluster files
+    --graph             print only intermediary graph files
+    --aln               print only intermediary duplication alignment files
+
+    #optional parameter for all subcommands
+    --tool|-t PATH      path to where the smore tool is located. Only needed,
+                        if the tool is located in a very specific location
+    --python PATH       path to python, onlz needed if python3 is not installed
+                        within the environment path variable
+    --perl PATH         path to perl, only needed if perl is not installed
+                        within the environment path variable

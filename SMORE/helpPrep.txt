@@ -1,0 +1,96 @@
+This subcommand will sort genetic elements in between genomic anchors
+based on MultiZ alignments. The genetic elements are
+taken from a list given as input or retrieved based on a covariance
+model as input for infernal.
+
+
+Usage: 
+smore prep --out PATH --ref REFSPECIES --maf PATH 
+           (--filter NUM) 
+           (--tool PATH) (--python PATH) (--perl PATH)
+
+with one of the following possibilities (a-d):
+
+a)       [--cm FILE --genomes PATH (--infernal PATH) 
+          (--incE NUM |--incT NUM) (--pseudo NUM)]
+b)       [--genes FILE ]
+c)       [--genomes PATH --loci FILE ]
+d)       [--trna (--trnascan PATH) --genomes PATH]
+
+
+Legend:
+() optional parameter
+[] set of parameters that belong together
+| either the first or the second option 
+
+
+  #General options
+    --out|-o PATH      folder where to write the output files. If the folder
+                       does not exist, it will be created
+    --ref|-r ID        name of the reference species as given in MultiZ files
+    --maf|-m PATH      folder containing all MultiZ alignments. Files can be
+                       compressed.
+    --filter NUM       optional: remove a percentage of the lowest scoring
+	               blocks base on the MAF scores; between 0 and 100
+  #Modes
+    ##CM mode
+    --cm|-c  FILE      covariance model file, input for infernal
+    --genomes|-g PATH  folder with genomes of the species used as an input
+                       to infernal to scan the genomes for genetic elements
+		       specified by the CM. Filenames should match species
+		       names in MultiZ files.
+    --incE NUM         optional parameter for infernal, e-value threshold
+    --incT NUM         optional parameter for infernal, bitscore threshold
+    --infernal PATH    optional, path to infernal installation if not installed
+                       in the path environment
+    --pseudo NUM       optional, bitscore threshold that defines pseudogenes
+
+    ##Genelist mode
+    --genes FILE       a list of genetic elements as input.
+	       	       Format (tab separated):
+			
+	               chromosome start_pos end_pos species strand type
+		       pseudogene sequence structure comment
+			
+		       -fields to be omitted are filled with NA
+		       -species name should be the same as in MultiZ files
+		       -type is optional (e.g. tRNA type Met)
+		       -pseudogene (optional): true or false
+		       -structure is optional, dot-bracket-notation
+		       -for optional sequence, take loci mode
+		       -comment is optional
+
+    ##Loci mode
+    --genomes|-g PATH  folder with genomes of the species used to retrieve
+		       the sequence of the genetic elements in the loci list
+		       based on their coordinates. Filenames should match
+		       species names in loci list files.
+    --loci FILE        list with genetic elements without sequence
+		       Format (tab separated):
+			
+		       chromosome start_pos end_pos species strand type
+		       pseudogene
+			
+		       -fields to be omitted are filled with NA
+		       -species name should be the same as in MultiZ files
+		       -type is optional (e.g. tRNA type Met)
+		       -pseudogene (optional): true or false
+
+    ##tRNAscan-SE mode
+    --trna             switch on mode that applies tRNAscan-SE on given genomes.
+    --genomes|-g PATH  folder with genomes of the species used to retrieve
+		       the sequence of the genetic elements in the loci list
+		       based on their coordinates. Filenames should match
+		       species names in loci list files.
+    --trnascan PATH    optional, installation path of tRNAscan-SE if not in 
+                       environment variable
+
+  #optional parameter for all subcommands
+    --tool|-t PATH      path to where the smore tool is located. Only needed,
+                        if the tool is located in a very specific location
+    --python PATH       path to python, onlz needed if python3 is not installed
+                        within the environment path variable
+    --perl PATH         path to perl, only needed if perl is not installed
+                        within the environment path variable
+
+

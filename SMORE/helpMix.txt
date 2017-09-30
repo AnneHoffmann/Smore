@@ -1,0 +1,60 @@
+This subcommand can be used after running SMORE prep. SMORE mix
+only produces a list of genetic clusters. This can be used to
+test different joining methods. Additionally, SMORE mix can split
+the number of clusters in several disjoint lists such that the
+succeeding subcommands can be run in parallel on the disjoint
+subsets to speed up running time of the program for large
+data sets. In case SMORE mix is splitting the list of clusters,
+it will output a command list that can be called to continue
+running the pipeline. The next subcommand to be called is
+SMORE roast.
+
+Usage: 
+smore mix --out PATH --prep PATH --species FILE
+            --newick FILE (--id FILE)
+            (--seqsim NUM) (--strucsim NUM) (--join LEVEL) (--nomiss) 
+	    (--max NUM)
+            (--verbose)
+            (--clus)
+            (--tool PATH) (--python PATH) (--perl PATH)
+
+Legend:
+() optional parameter
+[] set of parameters that belong together
+| either the first or the second option 
+
+    --out|-o PATH       folder where to write the output files. If the folder
+	                does not exist, it will be created
+    --prep PATH         folder with output from smore prep run
+    --species FILE      file listing all species one per line. Species
+                        identifier must be the same as in newick or id
+			and prep output data.
+    --newick FILE       tree in newick format containing the species included
+	                in the output of smore prep.
+    --id FILE		in case the species' identifier do not fit, this file
+	 		can be used to automatically translate the names
+			Format (tab separated):
+			current_name_in_tree name_to_translate_to
+    --seqsim|-s NUM     percentage of sequence similarity to be considered
+	                homolog sequences, default 0.8
+    --strucsim|-p NUM   percentage of structure similarity to be considered
+	                homolog sequences, default 0.8
+    --max NUM           maximal number of clusters to be included in the
+                        following steps of the analysis. In case there exist
+			more clusters, the program automatically splits the
+			data set and creates a command list for the following
+			steps of the pipeline. Default: 50000.
+    --join LEVEL	the way of how original clusters should be joined,
+			either none, strict or relaxed; default: relaxed
+    --nomiss            do not check for missing anchors. in case of large
+                        clusters, using --nomiss will speed up the runtime
+    --verbose           print all intermediary files, thus clusters
+    --clus              print only intermediary cluster files
+
+    #optional parameter for all subcommands
+    --tool|-t PATH      path to where the smore tool is located. Only needed,
+                        if the tool is located in a very specific location
+    --python PATH       path to python, onlz needed if python3 is not installed
+                        within the environment path variable
+    --perl PATH         path to perl, only needed if perl is not installed
+                        within the environment path variable

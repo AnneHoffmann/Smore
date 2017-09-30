@@ -1,0 +1,35 @@
+The subcommand bake combines the subcommands prep and toast in
+order to easily start and run the pipeline completely. Hence,
+parameters for bake are the same as the combined parameters
+for prep and toast.
+
+Usage: 
+smore bake --out PATH --ref REFSPECIES --maf PATH 
+           --newick FILE (--id FILE) 
+           (--filter NUM) 
+           (--tool PATH) (--python PATH) (--perl PATH)
+           (--seqsim NUM) (--strucsim NUM) (--join LEVEL) 
+           (--nomiss) 
+           (--verbose)
+           (--clus)
+           (--graph)
+           (--aln)
+
+with one of the following possibilities (a-d):
+
+a)       [--cm FILE --genomes PATH (--infernal PATH) 
+         (--incE NUM |--incT NUM) (--pseudo NUM)]
+b)       [--genes FILE ]
+c)       [--genomes PATH --loci FILE ]
+d)       [--trna (--trnascan PATH)]
+
+Legend:
+() optional parameter
+[] set of parameters that belong together
+| either the first or the second option
+
+
+For further details on the commands, please see 
+smore prep --help 
+and/or
+smore toast --help
