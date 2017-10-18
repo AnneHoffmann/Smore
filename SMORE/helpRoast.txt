@@ -5,7 +5,7 @@ to split and parallelize the process. The next subcommand in the
 pipeline will be SMORE eat.
 
 Usage: 
-smore roast --out PATH --in FILE --newick FILE (--id FILE)
+SMORE roast --out PATH --in FILE --newick FILE (--id FILE)
             (--seqsim NUM) (--strucsim NUM) (--nomiss) 
             (--verbose)
             (--graph)
@@ -20,13 +20,13 @@ Legend:
 
     --out|-o PATH       folder where to write the output files. If the folder
 	                does not exist, it will be created
-    --in|-i FILE        output file of smore mix containing a list of
+    --in|-i FILE        output file of SMORE mix containing a list of
                         clusters
     --species FILE      file listing all species one per line. Species
                         identifier must be the same as in newick or id
 			and prep output data.
     --newick FILE       tree in newick format containing the species included
-	                in the output of smore prep.
+	                in the output of SMORE prep.
     --id FILE		in case the species' identifier do not fit, this file
 	 		can be used to automatically translate the names
 			Format (tab separated):
@@ -42,7 +42,7 @@ Legend:
     --aln             print only intermediary duplication alignment files
 
     #optional parameter for all subcommands
-    --tool|-t PATH      path to where the smore tool is located. Only needed,
+    --tool|-t PATH      path to where the SMORE tool is located. Only needed,
                         if the tool is located in a very specific location
     --python PATH       path to python, onlz needed if python3 is not installed
                         within the environment path variable

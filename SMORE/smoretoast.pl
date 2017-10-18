@@ -41,8 +41,8 @@ GetOptions(
     'perl=s' => \$perlpath,
 ##options for toast and bake
     'prep=s' => \$pathtocam, #path to output of smore prep (genes folder)
-    'seqsim|s=s' => \$seqsim,
-    'strucsim|p=s' => \$strucsim,
+    'seqsim|s=f' => \$seqsim,
+    'strucsim|p=f' => \$strucsim,
     'newick=s' => \$newicktree,
     'join=s' => \$joinmode,
     'species=s' => \$specieslist,
@@ -95,6 +95,11 @@ my %block2spec = ();
 my @allspec = ();
 my %neighbors = (); #species_anchor -> leftneighbor_rightneighbor or -1 
 
+my %spec2mindist = ();  #in order to find the max/min distance between blocks in species
+my %spec2maxdist = ();
+my %spec2sumdist = ();
+my %spec2numdist = ();
+
 open FA,"<$specieslist" or die "can't open $specieslist\n";
 
 while(<FA>){
@@ -108,6 +113,10 @@ while(<FA>){
     push @allspec, $spec;
     #insert in %specis
     $species{$spec} = 0;
+    $spec2maxdist{$spec} = 0;
+    $spec2mindist{$spec} = 1000000;
+    $spec2sumdist{$spec} = 0;
+    $spec2numdist{$spec} = 0;
     $pseuspecies{$spec} = 0;
     #sort file and remove blanks
     my $curfile_nb = "$outpath\/$spec\_nb\.bed";
@@ -299,20 +308,38 @@ my $orignum = scalar (keys %blocks);
 print "Number of original clusters: $orignum \n";
 
 ##analyse original blocks for distances between elements
-my $maxdist = 0;
-my $mindist = -1;
-my $sumdist = 0;
 foreach my $block (keys %blocks){
-    my $dist = getMaxDist($blocks{$block});
-    if($dist > $maxdist){$maxdist = $dist;}
-    if($dist < $mindist || $mindist == -1){$mindist = $dist;}
-    $sumdist += $dist;
+    #output a hash with distance for each species that exist in the cluster and have a max and min pos
+    my %dists = getMaxDist($blocks{$block});
+    foreach my $s (keys %dists){
+	if($dists{$s} == 0){next;}
+	if(exists($spec2mindist{$s})){if($dists{$s} < $spec2mindist{$s}){$spec2mindist{$s}=$dists{$s};}}
+	else{$spec2mindist{$s}=$dists{$s};}
+	if(exists($spec2maxdist{$s})){if($dists{$s} > $spec2maxdist{$s}){$spec2maxdist{$s}=$dists{$s};}}
+	else{$spec2maxdist{$s}=$dists{$s};}
+	if(exists($spec2sumdist{$s})){$spec2sumdist{$s}+=$dists{$s};}
+	else{$spec2sumdist{$s}=$dists{$s};}
+	if(exists($spec2numdist{$s})){$spec2numdist{$s}++;}
+	else{$spec2numdist{$s}=1;}
+    }
 }
-my $avdist = $sumdist/$orignum;
 
-print "The largest distance between the most distant elements 
-in a cluster is $maxdist nt, the smallest is $mindist nt. On average,
-the most distant elements in original clusters have a distance of $avdist nt.\n";
+print "The following numbers show the maximal, minimal and average distances between
+elements in original clusters for each species (counted in nt).\n";
+print "species\tmaxdist\tmindist\taverage\tnum_of_counted_clusters\n";
+#calculate average distances
+foreach my $t (keys %spec2numdist){
+    my $avdist = sprintf "%.2f",$spec2sumdist{$t}/$spec2numdist{$t};
+    print "$t\t$spec2maxdist{$t}\t$spec2mindist{$t}\t$avdist\t$spec2numdist{$t}\n";
+    #reset the hashes in order to use it for joined clusters
+    $spec2maxdist{$t} = 0;
+    $spec2mindist{$t} = 1000000;
+    $spec2sumdist{$t} = 0;
+    $spec2numdist{$t} = 0;
+}
+
+
+
 
 
 #join cluster by hash num
@@ -480,7 +507,7 @@ foreach my $bk (keys %blocks){
 }
 close $outjc;
 
-my $origavsize = $sumelemorig/$orignum;
+my $origavsize = sprintf "%.2f",$sumelemorig/$orignum;
 print "Average number of elements of original clusters: $origavsize \n";
 
 if($joined == 1){    
@@ -489,20 +516,35 @@ if($joined == 1){
     %blocks = %joinedblocks;
 
     ##analyse original blocks for distances between elements
-    my $jmaxdist = 0;
-    my $jmindist = -1;
-    my $jsumdist = 0;
     foreach my $block (keys %blocks){
-	my $jdist = getMaxDist($blocks{$block});
-	if($jdist > $jmaxdist){$jmaxdist = $jdist;}
-	if($jdist < $jmindist || $jmindist == -1){$jmindist = $jdist;}
-	$jsumdist += $jdist;
+	#output a hash with distance for each species that exist in the cluster and have a max and min pos
+	my %dists = getMaxDist($blocks{$block});
+	foreach my $s (keys %dists){
+	    if($dists{$s} == 0){next;}
+	    if(exists($spec2mindist{$s})){if($dists{$s} < $spec2mindist{$s}){$spec2mindist{$s}=$dists{$s};}}
+	    else{$spec2mindist{$s}=$dists{$s};}
+	    if(exists($spec2maxdist{$s})){if($dists{$s} > $spec2maxdist{$s}){$spec2maxdist{$s}=$dists{$s};}}
+	    else{$spec2maxdist{$s}=$dists{$s};}
+	    if(exists($spec2sumdist{$s})){$spec2sumdist{$s}+=$dists{$s};}
+	    else{$spec2sumdist{$s}=$dists{$s};}
+	    if(exists($spec2numdist{$s})){$spec2numdist{$s}++;}
+	    else{$spec2numdist{$s}=1;}
+	}
     }
-    my $javdist = $jsumdist/$newclusnum;
     
-    print "Joined clusters: The largest distance between the most distant elements 
-in a cluster is $jmaxdist nt, the smallest is $jmindist nt. On average,
-the most distant elements in joined clusters have a distance of $javdist nt.\n";
+    print "The following numbers show the maximal, minimal and average distances between
+elements in joined clusters for each species (counted in nt).\n";
+    print "species\tmaxdist\tmindist\taverage\tnum_of_counted_clusters\n";
+    #calculate average distances
+    foreach my $t (keys %spec2numdist){
+	my $avdist = sprintf "%.2f",$spec2sumdist{$t}/$spec2numdist{$t};
+	print "$t\t$spec2maxdist{$t}\t$spec2mindist{$t}\t$avdist\t$spec2numdist{$t}\n";
+	#reset the hashes 
+	$spec2maxdist{$t} = 0;
+	$spec2mindist{$t} = 1000000;
+	$spec2sumdist{$t} = 0;
+	$spec2numdist{$t} = 0;
+    }
 }
 
 ##print None hash to file
@@ -542,6 +584,7 @@ my $allnonestr = "";
 foreach my $k (keys %nonesNT){
     $allnonestr = "$allnonestr$k\-$nonesNT{$k}\=";
 }
+if(scalar (keys %nonesNT) == 0){$allnonestr = "=";}
 $allnonestr = "$allnonestr\!";
 foreach my $k (keys %pseudononesNT){
     $allnonestr = "$allnonestr$k\-$pseudononesNT{$k}\=";
@@ -599,6 +642,23 @@ my %pseusinglesNT = (); #include types
 
 ##go on with cluster hash
 ##sort keys of blocks and join adjacent ones?
+
+my $cglist = "$outpath\/list\_cographs\.txt";
+my $ncglist = "$outpath\/list\_noncographs\.txt";
+my $cgcmd = "touch $cglist";
+my $ncgcmd = "touch $ncglist";
+readpipe("$cgcmd");
+readpipe("$ncgcmd");
+
+
+open(my $outcg,">>",$cglist);
+open(my $outn,">>",$ncglist);
+my $graphheader = "graph \t nodenum \t edgenum \t corr. edgenum \t density\n";
+print $outcg $graphheader;
+print $outn $graphheader;
+close $outcg;
+close $outn;
+
 
 my $eventlist = "$outpath\/allClusters_joined\.txt";
 my $listcmd = "touch $eventlist";
@@ -701,21 +761,6 @@ foreach my $k (keys %blocks){
     my $nodenum = $graphout[0];
     
     #check graph for cograph or not and edit slightly
-    my $cglist = "$outpath\/list\_cographs\.txt";
-    my $ncglist = "$outpath\/list\_noncographs\.txt";
-    my $cgcmd = "touch $cglist";
-    my $ncgcmd = "touch $ncglist";
-    readpipe("$cgcmd");
-    readpipe("$ncgcmd");
-
-
-    open(my $outcg,">>",$cglist);
-    open(my $outn,">>",$ncglist);
-    my $graphheader = "graph \t nodenum \t edgenum \t corr. edgenum \t density\n";
-    print $outcg $graphheader;
-    print $outn $graphheader;
-    close $outcg;
-    close $outn;
 
     my $checkcmd = "perl $toolpath\/checkGraph_fast.pl $tmpfile1  $k $seqsim $strucsim $mode $cglist $ncglist 2>> $errors";
     
@@ -729,7 +774,7 @@ foreach my $k (keys %blocks){
     my $filetoprint = "$alnfolder\/alignment$k\.aln";
 
     #create alignment    
-    my $alncmd = "perl $toolpath\/createAlignments_fast2.pl $tmpfile1 $outpath $toolpath $seqsim $strucsim $mode $typenum $newicktree $leftanchor $rightanchor $del2check $pseudel2check $toprint $filetoprint 2>> $errors";
+    my $alncmd = "perl $toolpath\/createAlignments_fast2.pl $tmpfile1 $outpath $toolpath $seqsim $strucsim $mode $typenum $newicktree $leftanchor $rightanchor $del2check $pseudel2check $toprint $filetoprint $errors 2>> $errors";
 
     my @outaln = readpipe("$alncmd"); #this array contains: dup mat insertion pseins pseudomatch deletion missinganchor missinanchorpseu deletionpseu rems inrems
     my $rmcmd;
@@ -1002,14 +1047,14 @@ foreach my $dl (sort keys %delevents) {
 }
 close $oute;
 
-open(my $outn,">>",$misout);
+open(my $outn2,">>",$misout);
 foreach my $ms (sort keys %misevents) {
     my @miss = split ',', $ms;
     @miss = sort @miss;
     my $msstr = join(',',@miss);
-    print $outn "$msstr\t$misevents{$ms}\n";
+    print $outn2 "$msstr\t$misevents{$ms}\n";
 }
-close $outn;
+close $outn2;
 
 open(my $outpm,">>",$psemisout);
 foreach my $pm (sort keys %psemis) {
@@ -1045,9 +1090,72 @@ my $countcmd = "perl $toolpath\/countEvents.pl $newicktree $allsinglestr $matcho
 readpipe("$countcmd");
 
 
-my $avnum = $sumelems/$cluscount;
+my $avnum = sprintf "%.2f",$sumelems/$cluscount;
 print "Average number of elements per cluster in joined cluster: $avnum\n";
 
+#cograph and noncograph information
+my $cgnodenumsum = 0;
+my $cgedgenumsum = 0;
+my $cgdensitysum = 0;
+my $cggraphnum = 0;
+open CGF,"<$cglist" or die "can't open $cglist \n";
+while(<CGF>){
+    my $cgline = $_;
+    if($cgline =~ /^graph/){next;}
+    my @CG = split '\t', $cgline;
+    $cggraphnum++;
+    $cgnodenumsum+=$CG[1];
+    $cgedgenumsum+=$CG[2];
+    $cgdensitysum+=$CG[4];
+}
+
+
+
+my $ncgnodenumsum = 0;
+my $ncgedgenumsum = 0;
+my $ncgdensitysum = 0;
+my $ncggraphnum = 0;
+open NCGF,"<$ncglist" or die "can't open $ncglist \n";
+while(<NCGF>){
+    my $ncgline = $_;
+    if($ncgline =~ /^graph/){next;}
+    my @NCG = split '\t', $ncgline;
+    $ncggraphnum++;
+    $ncgnodenumsum+=$NCG[1];
+    $ncgedgenumsum+=$NCG[2];
+    $ncgdensitysum+=$NCG[4];
+}
+
+my $avcgnodenum = 0;
+my $avcgedgenum = 0;
+my $avcgdensity = 0;
+
+if($cggraphnum>0){
+    $avcgnodenum = sprintf "%.2f",$cgnodenumsum/$cggraphnum;
+    $avcgedgenum = sprintf "%.2f",$cgedgenumsum/$cggraphnum;
+    $avcgdensity = sprintf "%.2f",$cgdensitysum/$cggraphnum;
+}
+
+
+my $avncgnodenum = 0;
+my $avncgedgenum = 0;
+my $avncgdensity = 0;
+
+if($ncggraphnum>0){
+    $avncgnodenum = sprintf "%.2f",$ncgnodenumsum/$ncggraphnum;
+    $avncgedgenum = sprintf "%.2f",$ncgedgenumsum/$ncggraphnum;
+    $avncgdensity = sprintf "%.2f",$ncgdensitysum/$ncggraphnum;
+}
+
+
+print "\n";
+print "Information on graph structures and corrections:\n";
+print "Number of cographs $cggraphnum, with on average\n";
+print "$avcgnodenum nodes, $avcgedgenum edges and a density of $avcgdensity.\n";
+print "Number of non-cographs $ncggraphnum, with on average\n";
+print "$avncgnodenum nodes, $avncgedgenum edges and a density of $avncgdensity.\n";
+print "All non-cographs were corrected to obtain a cograph structure.\n";
+print "\n";
 
 
 sub getRightBlock{
@@ -1107,6 +1215,8 @@ sub checkBlocks{
 sub getMaxDist{
     #input is separated by ; and then by tab
     my @inp = @_;
+    my %spec2max = ();
+    my %spec2min = ();
     my @F = split ';', $inp[0];
     my $minpos = -1;
     my $maxpos = 0;
@@ -1114,6 +1224,8 @@ sub getMaxDist{
 	my @G = split '\t', $F[$i];
 	my $start;
 	my $end;
+	my @H = split '_', $G[1];
+	my $spec = $H[0];
 	if($G[2] < $G[3]){
 	    $start = $G[2];
 	    $end = $G[3];
@@ -1122,9 +1234,18 @@ sub getMaxDist{
 	    $start = $G[3];
 	    $end = $G[2];
 	}
-	if($minpos == -1 || $start < $minpos){$minpos = $start;}
-	if($end > $maxpos){$maxpos = $end;}
+	if(exists($spec2min{$spec})){if($start < $spec2min{$spec}){$spec2min{$spec}=$start;}}
+	else{$spec2min{$spec}=$start;}
+
+	if(exists($spec2max{$spec})){if($end > $spec2max{$spec}){$spec2max{$spec}=$end;}}
+	else{$spec2max{$spec}=$end;}
     }
-    my $dist = $maxpos - $minpos;
-    return $dist;
+    my %spec2dist = ();
+    ##check all species that have an entry in both and return the distances
+    foreach my $k (keys %spec2max){
+	if(exists($spec2min{$k})){
+	    $spec2dist{$k} = $spec2max{$k} - $spec2min{$k};
+	}
+    }
+    return %spec2dist;
 }

@@ -5,7 +5,7 @@ parallelized runs such that all data is recombined at the
 phylogenetic tree.
 
 Usage: 
-smore eat --out PATH --prep PATH
+SMORE eat --out PATH --prep PATH
       	  --mix PATH --roast PATH
       	  --newick FILE (--id FILE)
           (--nomiss) 
@@ -19,11 +19,11 @@ Legend:
 
     --out|-o PATH       folder where to write the output files. If the folder
 	                does not exist, it will be created
-    --prep PATH         output folder containing smore prep output
-    --mix PATH          output folder containing smore mix output
-    --roast PATH        output folder containing smore roast output
+    --prep PATH         output folder containing SMORE prep output
+    --mix PATH          output folder containing SMORE mix output
+    --roast PATH        output folder containing SMORE roast output
     --newick FILE       tree in newick format containing the species included
-	                in the output of smore prep.
+	                in the output of SMORE prep.
     --id FILE		in case the species' identifier do not fit, this file
 	 		can be used to automatically translate the names
 			Format (tab separated):
@@ -32,7 +32,7 @@ Legend:
                         clusters, using --nomiss will speed up the runtime
 
     #optional parameter for all subcommands
-    --tool|-t PATH      path to where the smore tool is located. Only needed,
+    --tool|-t PATH      path to where the SMORE tool is located. Only needed,
                         if the tool is located in a very specific location
     --python PATH       path to python, onlz needed if python3 is not installed
                         within the environment path variable

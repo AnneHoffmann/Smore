@@ -29,7 +29,7 @@ and allClusters_joined.txt: These two files contain lists of clusters
                             showing which elements are contained together
                             in one cluster before and after joining.
 
-*_errors: for each part of the smore pipeline, there is a file giving errors
+*_errors: for each part of the SMORE pipeline, there is a file giving errors
           that happened during the run. If no errors occured, the file is
           empty.
 
@@ -65,12 +65,12 @@ files. They will be in three different folders: cluster, graph and
 duplication_alignment. The files contain the specific structures of the cluster in
 each step of the analysis and can be used to gain a deeper insight.
 
-smore mix output: the smore mix program will output a list of genetic clusters.
+SMORE mix output: the SMORE mix program will output a list of genetic clusters.
 In case the number of cluster is higher than the number set with --max option
 (default:50000), there will be several lists and a list of commands that can be
-used to call the following subcommand of the pipeline (smore roast).
+used to call the following subcommand of the pipeline (SMORE roast).
 
-smore roast output: smore roast will output files that include counts for
-genetic events. Those files can be read by smore eat. If smore roast is called
-several times on different lists of clusters, smore eat will summarize the files
+SMORE roast output: SMORE roast will output files that include counts for
+genetic events. Those files can be read by SMORE eat. If SMORE roast is called
+several times on different lists of clusters, SMORE eat will summarize the files
 and produce the output on the summarized counts.

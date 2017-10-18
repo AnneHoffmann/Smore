@@ -6,7 +6,7 @@ of --clus, --graph, --aln. Please note that the verbose version might
 take significantly longer.
 
 Usage: 
-smore toast --out PATH --newick FILE (--id FILE)
+SMORE toast --out PATH --newick FILE (--id FILE)
             (--seqsim NUM) (--strucsim NUM) (--join LEVEL) (--nomiss) 
             (--verbose)
             (--clus)
@@ -22,13 +22,13 @@ Legend:
 
     --out|-o PATH       folder where to write the output files. If the folder
 	                does not exist, it will be created
-    --prep PATH         folder with output from smore prep run
+    --prep PATH         folder with output from SMORE prep run
     --seqsim|-s NUM     percentage of sequence similarity to be considered
 	                homolog sequences, default 0.8
     --strucsim|-p NUM   percentage of structure similarity to be considered
 	                homolog sequences, default 0.8
     --newick FILE       tree in newick format containing the species included
-	                in the output of smore prep.
+	                in the output of SMORE prep.
     --id FILE		in case the species' identifier do not fit, this file
 	 		can be used to automatically translate the names
 			Format (tab separated):
@@ -44,7 +44,7 @@ Legend:
     --aln               print only intermediary duplication alignment files
 
     #optional parameter for all subcommands
-    --tool|-t PATH      path to where the smore tool is located. Only needed,
+    --tool|-t PATH      path to where the SMORE tool is located. Only needed,
                         if the tool is located in a very specific location
     --python PATH       path to python, onlz needed if python3 is not installed
                         within the environment path variable

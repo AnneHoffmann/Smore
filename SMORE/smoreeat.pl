@@ -81,6 +81,7 @@ if(! $nocheck){
 	my $CTF = IO::Uncompress::Gunzip->new( "$pathtocam\/temp/$curtmpfile" )
 	    or die "IO::Uncompress::Gunzip failed: $GunzipError\n";
 	while(<$CTF>){
+	    chomp;
 	    my $tmpline = $_;
 	    my @TL = split '\t', $tmpline;
 	    my @PTL = split '_', $TL[1];
@@ -100,7 +101,7 @@ while(<FA>){
     chomp;
     my $del2check = $_;
     ##now, we check if anchors exist with
-    open DC,"<$roastout\/$del2check" or die "can't open $roastout\/$del2check \n";
+    open DC,"<$del2check" or die "can't open $del2check \n";
     while(<DC>){
 	my $l2c = $_;
 	my @ll2c = split '\t', $l2c;
@@ -144,7 +145,7 @@ open FP,"<$pdelchecklist" or die "can't open $pdelchecklist\n";
 while(<FP>){
     chomp;
     my $pseudel2check = $_;
-    open PC,"<$roastout\/$pseudel2check" or die "can't open $roastout\/$pseudel2check \n";
+    open PC,"<$pseudel2check" or die "can't open $pseudel2check \n";
     while(<PC>){
 	my $l2c = $_;
 	my @ll2c = split '\t', $l2c;
@@ -222,10 +223,11 @@ open DU,"<$dupllist" or die "can't open $dupllist\n";
 while(<DU>){
     chomp;
     my $curdup = $_;
-    open CDU,"<$roastout\/$curdup" or die "can't open $roastout\/$curdup\n";
+    open CDU,"<$curdup" or die "can't open $curdup\n";
     while(<CDU>){
 	chomp;
 	my @DE = split '\t', $_;
+	if(scalar @DE == 0){next;}
 	if(exists($dupevents{$DE[0]})){$dupevents{$DE[0]}+=$DE[1];}
 	else{$dupevents{$DE[0]}=$DE[1];}
     }
@@ -248,10 +250,11 @@ open MA,"<$matlist" or die "can't open $matlist\n";
 while(<MA>){
     chomp;
     my $curmat = $_;
-    open CMA,"<$roastout\/$curmat" or die "can't open $roastout\/$curmat\n";
+    open CMA,"<$curmat" or die "can't open $curmat\n";
     while(<CMA>){
 	chomp;
 	my @ME = split '\t', $_;
+	if(scalar @ME == 0){next;}
 	if(exists($matevents{$ME[0]})){$matevents{$ME[0]}+=$ME[1];}
 	else{$matevents{$ME[0]}=$ME[1];}
     }
@@ -274,10 +277,11 @@ open PMA,"<$pmatlist" or die "can't open $pmatlist\n";
 while(<PMA>){
     chomp;
     my $pcurmat = $_;
-    open PCMA,"<$roastout\/$pcurmat" or die "can't open $roastout\/$pcurmat\n";
+    open PCMA,"<$pcurmat" or die "can't open $pcurmat\n";
     while(<PCMA>){
 	chomp;
 	my @PME = split '\t', $_;
+	if(scalar @PME == 0){next;}
 	if(exists($psevents{$PME[0]})){$psevents{$PME[0]}+=$PME[1];}
 	else{$psevents{$PME[0]}=$PME[1];}
     }
@@ -300,10 +304,11 @@ open IA,"<$inslist" or die "can't open $inslist\n";
 while(<IA>){
     chomp;
     my $curins = $_;
-    open CIA,"<$roastout\/$curins" or die "can't open $roastout\/$curins\n";
+    open CIA,"<$curins" or die "can't open $curins\n";
     while(<CIA>){
 	chomp;
 	my @IE = split '\t', $_;
+	if(scalar @IE == 0){next;}
 	if(exists($insevents{$IE[0]})){$insevents{$IE[0]}+=$IE[1];}
 	else{$insevents{$IE[0]}=$IE[1];}
     }
@@ -326,10 +331,11 @@ open PIA,"<$pinslist" or die "can't open $pinslist\n";
 while(<PIA>){
     chomp;
     my $curpins = $_;
-    open CPIA,"<$roastout\/$curpins" or die "can't open $roastout\/$curpins\n";
+    open CPIA,"<$curpins" or die "can't open $curpins\n";
     while(<CPIA>){
 	chomp;
 	my @PIE = split '\t', $_;
+	if(scalar @PIE == 0){next;}
 	if(exists($pseins{$PIE[0]})){$pseins{$PIE[0]}+=$PIE[1];}
 	else{$pseins{$PIE[0]}=$PIE[1];}
     }
@@ -353,10 +359,11 @@ open IS,"<$sinlist" or die "can't open $sinlist\n";
 while(<IS>){
     chomp;
     my $cursin = $_;
-    open CIS,"<$roastout\/$cursin" or die "can't open $roastout\/$cursin\n";
+    open CIS,"<$cursin" or die "can't open $cursin\n";
     while(<CIS>){
 	chomp;
 	my @SIE = split '\t', $_;
+	if(scalar @SIE == 0){next;}
 	my @Sspec = split '_', $SIE[0];
 	if(exists($singles{$Sspec[0]})){$singles{$Sspec[0]}+=$SIE[1];}
 	else{$singles{$Sspec[0]}=$SIE[1];}
@@ -375,10 +382,11 @@ open IP,"<$psinlist" or die "can't open $psinlist\n";
 while(<IP>){
     chomp;
     my $curpsin = $_;
-    open CIP,"<$roastout\/$curpsin" or die "can't open $roastout\/$curpsin\n";
+    open CIP,"<$curpsin" or die "can't open $curpsin\n";
     while(<CIP>){
 	chomp;
 	my @SIP = split '\t', $_;
+	if(scalar @SIP == 0){next;}
 	my @Sspecp = split '_', $SIP[0];
 	if(exists($pseusingles{$Sspecp[0]})){$pseusingles{$Sspecp[0]}+=$SIP[1];}
 	else{$pseusingles{$Sspecp[0]}=$SIP[1];}
@@ -405,6 +413,7 @@ open NFP,"<$pnonefile" or die "can't open $pnonefile\n";
 while(<NFP>){
     chomp;
     my @NLP = split '\t', $_;
+    if(scalar @NLP == 0){next;}
     my @Nspecp = split '_', $NLP[0];
     $allnonestr = "$allnonestr\=$Nspecp[0]\-$NLP[1]";
 }
@@ -425,6 +434,7 @@ open TFP,"<$ptotfile" or die "can't open $ptotfile\n";
 while(<TFP>){
     chomp;
     my @TLP = split '\t', $_;
+    if(scalar @TLP == 0){next;}
     my @Tspecp = split '_', $TLP[0];
     $allspecstr = "$allspecstr\=$Tspecp[0]\-$TLP[1]";
 }
@@ -446,3 +456,102 @@ readpipe("$cmdtree");
 my $countcmd = "perl $toolpath\/countEvents.pl $newicktree $allsinglestr $matchout $duplout $insout $pseout $psemisout $psedelout $pseinsout $delout $misout $outfolder\/OutTree\.txt $outfolder\/geneticEvents\.txt $allspecstr $allnonestr $outfolder\/data_iTOL 2>> $err";
 
 readpipe("$countcmd");
+
+
+##analyse cograph/noncographs
+my $allcglist = "$outfolder\/list\_allcographs\.txt";
+my $allncglist = "$outfolder\/list\_allnoncographs\.txt";
+open(my $outcglist,">>",$allcglist);
+open(my $outncglist,">>",$allncglist);
+
+my $cglist = "$outfolder\/list\_allcographs";
+my $cglistcmd = "ls $roastout\/list\_cographs\* > $cglist";
+readpipe("$cglistcmd");
+open CGL,"<$cglist" or die "can't open $cglist\n";
+while(<CGL>){
+    chomp;
+    my $curcgl = $_;
+    open CGLU,"<$curcgl" or die "can't open $curcgl\n";
+    while(<CGLU>){
+	my $cgline = $_;
+	if($cgline =~ /^graph/){next;}
+	print $outcglist $cgline;
+    }
+}
+
+my $ncglist = "$outfolder\/list\_allnoncographs";
+my $ncglistcmd = "ls $roastout\/list\_noncographs\* > $ncglist";
+readpipe("$ncglistcmd");
+open NCGL,"<$ncglist" or die "can't open $ncglist\n";
+while(<NCGL>){
+    chomp;
+    my $ncurcgl = $_;
+    open NCGLU,"<$ncurcgl" or die "can't open $ncurcgl\n";
+    while(<NCGLU>){
+	my $ncgline = $_;
+	if($ncgline =~ /^graph/){next;}
+	print $outncglist $ncgline;
+    }
+}
+
+
+
+my $cgnodenumsum = 0;
+my $cgedgenumsum = 0;
+my $cgdensitysum = 0;
+my $cggraphnum = 0;
+open CGF,"<$allcglist" or die "can't open $allcglist \n";
+while(<CGF>){
+    my $cgline = $_;
+    my @CG = split '\t', $cgline;
+    $cggraphnum++;
+    $cgnodenumsum+=$CG[1];
+    $cgedgenumsum+=$CG[2];
+    $cgdensitysum+=$CG[4];
+}
+
+
+
+my $ncgnodenumsum = 0;
+my $ncgedgenumsum = 0;
+my $ncgdensitysum = 0;
+my $ncggraphnum = 0;
+open NCGF,"<$allncglist" or die "can't open $allncglist \n";
+while(<NCGF>){
+    my $ncgline = $_;
+    my @NCG = split '\t', $ncgline;
+    $ncggraphnum++;
+    $ncgnodenumsum+=$NCG[1];
+    $ncgedgenumsum+=$NCG[2];
+    $ncgdensitysum+=$NCG[4];
+}
+
+my $avcgnodenum = 0;
+my $avcgedgenum = 0;
+my $avcgdensity = 0;
+
+if($cggraphnum>0){
+    $avcgnodenum = sprintf "%.2f",$cgnodenumsum/$cggraphnum;
+    $avcgedgenum = sprintf "%.2f",$cgedgenumsum/$cggraphnum;
+    $avcgdensity = sprintf "%.2f",$cgdensitysum/$cggraphnum;
+}
+
+
+my $avncgnodenum = 0;
+my $avncgedgenum = 0;
+my $avncgdensity = 0;
+
+if($ncggraphnum>0){
+    $avncgnodenum = sprintf "%.2f",$ncgnodenumsum/$ncggraphnum;
+    $avncgedgenum = sprintf "%.2f",$ncgedgenumsum/$ncggraphnum;
+    $avncgdensity = sprintf "%.2f",$ncgdensitysum/$ncggraphnum;
+}
+
+print "\n";
+print "Information on graph structures and corrections:\n";
+print "Number of cographs $cggraphnum, with on average\n";
+print "$avcgnodenum nodes, $avcgedgenum edges and a density of $avcgdensity.\n";
+print "Number of non-cographs $ncggraphnum, with on average\n";
+print "$avncgnodenum nodes, $avncgedgenum edges and a density of $avncgdensity.\n";
+print "All non-cographs were corrected to obtain a cograph structure.\n";
+print "\n";

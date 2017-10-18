@@ -40,10 +40,10 @@ GetOptions(
     'prep|i=s' => \$pathtocam, #path to output of smore prep (genes folder)
     'join=s' => \$joinmode,
     'species=s' => \$specieslist,
-    'max=s' => \$maxclusnum,
+    'max=f' => \$maxclusnum,
     #options for creating roast commands
-    'seqsim|s=s' => \$seqsim,
-    'strucsim|p=s' => \$strucsim,
+    'seqsim|s=f' => \$seqsim,
+    'strucsim|p=f' => \$strucsim,
     'newick=s' => \$newicktree,
     'err=s' => \$errors,
     'nomiss' => \$nocheck,
@@ -73,6 +73,12 @@ my %neighbors = (); #species_anchor -> leftneighbor_rightneighbor or -1
 
 my %types = (); #this is only the types, not the species
 
+my %spec2mindist = ();  #in order to find the max/min distance between blocks in species
+my %spec2maxdist = ();
+my %spec2sumdist = ();
+my %spec2numdist = ();
+
+
 open FA,"<$specieslist" or die "can't open $specieslist\n";
 
 while(<FA>){
@@ -86,6 +92,10 @@ while(<FA>){
     push @allspec, $spec;
     #insert in %specis
     $species{$spec} = 0;
+    $spec2maxdist{$spec} = 0;
+    $spec2mindist{$spec} = 1000000;
+    $spec2sumdist{$spec} = 0;
+    $spec2numdist{$spec} = 0;
     $pseuspecies{$spec} = 0;
     #sort file and remove blanks
     my $curfile_nb = "$outpath\/$spec\_nb\.bed";
@@ -278,21 +288,40 @@ print "Number of different element types: $typenum \n";
 my $orignum = scalar (keys %blocks);
 print "Number of original clusters: $orignum \n";
 
-##analyse original blocks for distances between elements
-my $maxdist = 0;
-my $mindist = -1;
-my $sumdist = 0;
-foreach my $block (keys %blocks){
-    my $dist = getMaxDist($blocks{$block});
-    if($dist > $maxdist){$maxdist = $dist;}
-    if($dist < $mindist || $mindist == -1){$mindist = $dist;}
-    $sumdist += $dist;
-}
-my $avdist = $sumdist/$orignum;
 
-print "The largest distance between the most distant elements 
-in a cluster is $maxdist nt, the smallest is $mindist nt. On average,
-the most distant elements in original clusters have a distance of $avdist nt.\n";
+##analyse original blocks for distances between elements
+foreach my $block (keys %blocks){
+    #output a hash with distance for each species that exist in the cluster and have a max and min pos
+    my %dists = getMaxDist($blocks{$block});
+    foreach my $s (keys %dists){
+	if($dists{$s} == 0){next;}
+	if(exists($spec2mindist{$s})){if($dists{$s} < $spec2mindist{$s}){$spec2mindist{$s}=$dists{$s};}}
+	else{$spec2mindist{$s}=$dists{$s};}
+	if(exists($spec2maxdist{$s})){if($dists{$s} > $spec2maxdist{$s}){$spec2maxdist{$s}=$dists{$s};}}
+	else{$spec2maxdist{$s}=$dists{$s};}
+	if(exists($spec2sumdist{$s})){$spec2sumdist{$s}+=$dists{$s};}
+	else{$spec2sumdist{$s}=$dists{$s};}
+	if(exists($spec2numdist{$s})){$spec2numdist{$s}++;}
+	else{$spec2numdist{$s}=1;}
+    }
+}
+
+print "The following numbers show the maximal, minimal and average distances between
+elements in original clusters for each species (counted in nt).\n";
+print "species\tmaxdist\tmindist\taverage\tnum_of_counted_clusters\n";
+#calculate average distances
+foreach my $t (keys %spec2numdist){
+    my $avdist = sprintf "%.2f",$spec2sumdist{$t}/$spec2numdist{$t};
+    print "$t\t$spec2maxdist{$t}\t$spec2mindist{$t}\t$avdist\t$spec2numdist{$t}\n";
+    #reset the hashes in order to use it for joined clusters
+    $spec2maxdist{$t} = 0;
+    $spec2mindist{$t} = 1000000;
+    $spec2sumdist{$t} = 0;
+    $spec2numdist{$t} = 0;
+}
+
+
+
 
 
 #join cluster by hash num
@@ -467,7 +496,7 @@ foreach my $bk (keys %blocks){
 }
 close $outjc;
 
-my $origavsize = $sumelemorig/$orignum;
+my $origavsize = sprintf "%.2f",$sumelemorig/$orignum;
 print "Average number of elements of original clusters: $origavsize \n";
 
 my $newclusnum = 0;
@@ -477,20 +506,36 @@ if($joined == 1){
     %blocks = %joinedblocks;
 
     ##analyse original blocks for distances between elements
-    my $jmaxdist = 0;
-    my $jmindist = -1;
-    my $jsumdist = 0;
     foreach my $block (keys %blocks){
-	my $jdist = getMaxDist($blocks{$block});
-	if($jdist > $jmaxdist){$jmaxdist = $jdist;}
-	if($jdist < $jmindist || $jmindist == -1){$jmindist = $jdist;}
-	$jsumdist += $jdist;
+	#output a hash with distance for each species that exist in the cluster and have a max and min pos
+	my %dists = getMaxDist($blocks{$block});
+	foreach my $s (keys %dists){
+	    if($dists{$s} == 0){next;}
+	    if(exists($spec2mindist{$s})){if($dists{$s} < $spec2mindist{$s}){$spec2mindist{$s}=$dists{$s};}}
+	    else{$spec2mindist{$s}=$dists{$s};}
+	    if(exists($spec2maxdist{$s})){if($dists{$s} > $spec2maxdist{$s}){$spec2maxdist{$s}=$dists{$s};}}
+	    else{$spec2maxdist{$s}=$dists{$s};}
+	    if(exists($spec2sumdist{$s})){$spec2sumdist{$s}+=$dists{$s};}
+	    else{$spec2sumdist{$s}=$dists{$s};}
+	    if(exists($spec2numdist{$s})){$spec2numdist{$s}++;}
+	    else{$spec2numdist{$s}=1;}
+	}
     }
-    my $javdist = $jsumdist/$newclusnum;
     
-    print "Joined clusters: The largest distance between the most distant elements 
-in a cluster is $jmaxdist nt, the smallest is $jmindist nt. On average,
-the most distant elements in joined clusters have a distance of $javdist nt.\n";
+    print "The following numbers show the maximal, minimal and average distances between
+elements in joined clusters for each species (counted in nt).\n";
+    print "species\tmaxdist\tmindist\taverage\tnum_of_counted_clusters\n";
+    #calculate average distances
+    foreach my $t (keys %spec2numdist){
+	my $avdist = sprintf "%.2f",$spec2sumdist{$t}/$spec2numdist{$t};
+	print "$t\t$spec2maxdist{$t}\t$spec2mindist{$t}\t$avdist\t$spec2numdist{$t}\n";
+	#reset the hashes 
+	$spec2maxdist{$t} = 0;
+	$spec2mindist{$t} = 1000000;
+	$spec2sumdist{$t} = 0;
+	$spec2numdist{$t} = 0;
+    }
+    
 }
 
 
@@ -563,7 +608,7 @@ if($joined==1){
 	}
     }
         
-    my $avnum = $sumelems/$cluscount;
+    my $avnum = sprintf "%.2f",$sumelems/$cluscount;
     print "Average number of elements per cluster: $avnum\n";
 }
 
@@ -631,6 +676,10 @@ else{
 	    print $outg2 "$B[$cb]\n";
 	}
     }
+    #print last command
+    close $outg2;
+    my $rstcmd = "smore roast --tool $toolpath --out $outpath --python $pythonpath --perl $perlpath --in $partfile -s $seqsim -p $strucsim --newick $newicktree --species $specieslist $optstr\n\n";
+    print $outcmd $rstcmd;
 }
 
 
@@ -689,6 +738,51 @@ sub checkBlocks{
 }
 
 
+
+
+
+sub getMaxDist{
+    #input is separated by ; and then by tab
+    my @inp = @_;
+    my %spec2max = ();
+    my %spec2min = ();
+    my @F = split ';', $inp[0];
+    my $minpos = -1;
+    my $maxpos = 0;
+    for(my $i=0;$i<scalar @F;$i++){
+	my @G = split '\t', $F[$i];
+	my $start;
+	my $end;
+	my @H = split '_', $G[1];
+	my $spec = $H[0];
+	if($G[2] < $G[3]){
+	    $start = $G[2];
+	    $end = $G[3];
+	}
+	else{
+	    $start = $G[3];
+	    $end = $G[2];
+	}
+	if(exists($spec2min{$spec})){if($start < $spec2min{$spec}){$spec2min{$spec}=$start;}}
+	else{$spec2min{$spec}=$start;}
+
+	if(exists($spec2max{$spec})){if($end > $spec2max{$spec}){$spec2max{$spec}=$end;}}
+	else{$spec2max{$spec}=$end;}
+    }
+    my %spec2dist = ();
+    ##check all species that have an entry in both and return the distances
+    foreach my $k (keys %spec2max){
+	if(exists($spec2min{$k})){
+	    $spec2dist{$k} = $spec2max{$k} - $spec2min{$k};
+	}
+    }
+    return %spec2dist;
+}
+
+
+__END__
+
+##old version of getMaxDist
 sub getMaxDist{
     #input is separated by ; and then by tab
     my @inp = @_;

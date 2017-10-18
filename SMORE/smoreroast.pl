@@ -37,8 +37,8 @@ GetOptions(
     'perl=s' => \$perlpath,
 ##options for toast and bake
     'in|i=s' => \$cluslistpath,
-    'seqsim|s=s' => \$seqsim,
-    'strucsim|p=s' => \$strucsim,
+    'seqsim|s=f' => \$seqsim,
+    'strucsim|p=f' => \$strucsim,
     'newick=s' => \$newicktree,
     'species=s' => \$specieslist,
     'nomiss' => \$nocheck,
@@ -317,6 +317,9 @@ foreach my $k (keys %blocks){
 }#end FA
 close $outsi;
 close $outsr;
+
+
+
 ##print singletons to file and create allsinglestr
 my $singleout = "$outpath\/singletons\_$cluslist";
 my $pseusingleout = "$outpath\/pseusingletons\_$cluslist";

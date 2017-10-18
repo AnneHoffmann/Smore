@@ -5,7 +5,7 @@ model as input for infernal.
 
 
 Usage: 
-smore prep --out PATH --ref REFSPECIES --maf PATH 
+SMORE prep --out PATH --ref REFSPECIES --maf PATH 
            (--filter NUM) 
            (--tool PATH) (--python PATH) (--perl PATH)
 
@@ -86,7 +86,7 @@ Legend:
                        environment variable
 
   #optional parameter for all subcommands
-    --tool|-t PATH      path to where the smore tool is located. Only needed,
+    --tool|-t PATH      path to where the SMORE tool is located. Only needed,
                         if the tool is located in a very specific location
     --python PATH       path to python, onlz needed if python3 is not installed
                         within the environment path variable

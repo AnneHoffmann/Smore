@@ -683,7 +683,7 @@ my $header_ins =
 "DATASET_TEXT
 SEPARATOR COMMA
 DATASET_LABEL,Insertions
-COLOR,#00ff00\n";
+COLOR,#078407\n";
 
 my $header_sin =
 "DATASET_TEXT
@@ -758,7 +758,7 @@ my $legend =
 "
 LEGEND_TITLE,Element Counts
 LEGEND_SHAPES,1,1,1,1,1,1,1
-LEGEND_COLORS,#000000,#00ff00,#ffa500,#ff0000,#0000ff,#551a8b,#A9A9A9
+LEGEND_COLORS,#000000,#078407,#ffa500,#ff0000,#0000ff,#551a8b,#A9A9A9
 LEGEND_LABELS,Total,Insertions,Singletons,Deletions,Duplications,Excluded,Missing_Data
 ";
 
@@ -809,7 +809,7 @@ for(my $tt=0;$tt < scalar @T;$tt++){
 	    print $outx "$T[$tt],$nline,-1,#000000,normal,1,0\n";
 	    my $sumi = $insertions{$T[$tt]} + $plusnodes{$T[$tt]};
 	    my $psumi = $pseudos{$T[$tt]} + $psein{$T[$tt]};
-	    print $outi "$T[$tt],$sumi\($psumi\),-1,#00ff00,normal,1,0\n";
+	    print $outi "$T[$tt],$sumi\($psumi\),-1,#078407,normal,1,0\n";
 	    print $outz "$T[$tt],$singletons{$T[$tt]}\($pseusingles{$T[$tt]}\),-1,#ffa500,normal,1,0\n";
 	    print $outd "$T[$tt],$minusnodes{$T[$tt]}\($psdels{$T[$tt]}\),-1,#ff0000,normal,1,0\n";
 	    print $outu "$T[$tt],$duplications{$T[$tt]},-1,#0000ff,normal,1,0\n";
@@ -821,7 +821,7 @@ for(my $tt=0;$tt < scalar @T;$tt++){
 	    print $outn "$T[$tt],$T[$tt],0,#000000,normal,1,0\n";
 	    my $sumi2 = $insertions{$T[$tt]} + $plusnodes{$T[$tt]};
 	    my $psumi2 = $pseudos{$T[$tt]} + $psein{$T[$tt]};
-	    print $outi "$T[$tt],$sumi2\($psumi2\),0.6,#00ff00,normal,1,0\n";
+	    print $outi "$T[$tt],$sumi2\($psumi2\),0.6,#078407,normal,1,0\n";
 	    print $outd "$T[$tt],$minusnodes{$T[$tt]}\($psdels{$T[$tt]}\),0.8,#ff0000,normal,1,0\n";
 	    #duplications do not occur at inner nodes
 	}

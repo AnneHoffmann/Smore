@@ -4,7 +4,7 @@ parameters for bake are the same as the combined parameters
 for prep and toast.
 
 Usage: 
-smore bake --out PATH --ref REFSPECIES --maf PATH 
+SMORE bake --out PATH --ref REFSPECIES --maf PATH 
            --newick FILE (--id FILE) 
            (--filter NUM) 
            (--tool PATH) (--python PATH) (--perl PATH)
@@ -30,6 +30,6 @@ Legend:
 
 
 For further details on the commands, please see 
-smore prep --help 
+SMORE prep --help 
 and/or
-smore toast --help
+SMORE toast --help

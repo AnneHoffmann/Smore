@@ -4,7 +4,7 @@
 
 This is the readme to the SMORE pipeline, Synteny Modulator Of Repetitive Elements.
 
-Usage: ./smore [general_options]
+Usage: ./SMORE [general_options]
 
 The general options are:
 
@@ -15,9 +15,9 @@ The general options are:
         --helpout       print explanation for structure and visualization of
 	                output files
 
-For subcommands, use: ./smore 'subcommand' [options]
+For subcommands, use: ./SMORE 'subcommand' [options]
 
-The smore subcommands are:
+The SMORE subcommands are:
 
     bake    The subcommand bake combines the subcommands prep and toast in
             order to easily start and run the pipeline completely. Hence,
@@ -63,5 +63,5 @@ The smore subcommands are:
 For more details, please see the SMORE manual or the SMORE help pages.
 
 For subcommands' help pages:
-./smore 'subcommand' --help
+./SMORE 'subcommand' --help
 

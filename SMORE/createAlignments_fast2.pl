@@ -22,6 +22,7 @@ my $del2check = shift;
 my $pseudel2check = shift;
 my $toprint = shift;
 my $alnfile = shift;
+my $errorfile = shift;
 
 if(! $toprint){$toprint = 0;}
 
@@ -68,6 +69,7 @@ my $letnum = scalar @letters;
 
 my %node2letter = ();
 my %species = ();
+my %spec2id = ();
 my %start2node = ();
 my %pgenes = (); ##pseudogenes
 my %spec2pseudo = ();   
@@ -76,6 +78,8 @@ my @arcs = ();
 
 
 open FA,"<$file" or die "can't open $file\n";
+
+my $id = 0;
 
 while(<FA>){
     chomp;
@@ -116,11 +120,15 @@ while(<FA>){
     else{
 	#nodes look like: chr_spec_id_start_end_strand_type_pseudo
 	#	    chr2A_gorGor3_276_9333523_9333524_-_Undet_TRUE
-	#	    chr6_GL000252v2_alt_hg38_1276_10814083_10814084_-_Ala_FALSA
+	#	    chr6_GL000252v2_alt_hg38_1276_10814083_10814084_-_Ala_FALSE
 	my $spec = $G[(scalar @G) - 7];
 	$species{$spec} = "";
+	if(exists($spec2id{$spec})){}
+	else{$spec2id{$spec} = $id; $id++;}
 	my $spec2 = $G2[(scalar @G2) - 7];
 	$species{$spec2} = "";
+	if(exists($spec2id{$spec2})){}
+	else{$spec2id{$spec2} = $id; $id++;}
 	$spec2pseudo{$spec} = "";
 	$spec2pseudo{$spec2} = "";
 	##if we find a pseudogenes, add it to the pseudogene vector and remove it from the analysis
@@ -128,12 +136,12 @@ while(<FA>){
 	my $p2 = $G2[(scalar @G2) - 1];
 	if($p1 eq "T" || $p1 eq "t" || $p1 eq "True" || $p1 eq "true"
 	   || $p1 eq "1" || $p1 eq "TRUE"){if(exists($pgenes{$n1})){}else{$pgenes{$n1}=1;}$isp1 = 1;}
-	my $startvec = $G[(scalar @G) - 5] + (0.0001 * $G[(scalar @G) - 6]);
+	my $startvec = $G[(scalar @G) - 5] + (0.0001 * $G[(scalar @G) - 4]) + $spec2id{$spec};
 	if(exists $start2node{$startvec}){}
 	else{$start2node{$startvec} = $n1;}
 	if($p2 eq "T" || $p2 eq "t" || $p2 eq "True" || $p2 eq "true"
 	   || $p2 eq "1" || $p2 eq "TRUE"){if(exists($pgenes{$n2})){}else{$pgenes{$n2}=1;} $isp2 = 1;}
-	my $startvec2 = $G2[(scalar @G2) - 5] + (0.0001 * $G2[(scalar @G2) - 6]);
+	my $startvec2 = $G2[(scalar @G2) - 5] + (0.0001 * $G2[(scalar @G2) - 4]) + $spec2id{$spec2};
 	if(exists $start2node{$startvec2}){}
 	else{$start2node{$startvec2} = $n2;}
 	#remoldings
@@ -579,7 +587,7 @@ else{
 	#thus here: counting of deletion events and missing data
 	if($spnum > 1){
 	    #species: comma-separated in $spstr
-	    my @missingspecs = getMissingSpecs($spstr,$nwtree);
+	    my @missingspecs = getMissingSpecs($spstr,$nwtree,$errorfile);
 	    if(scalar @missingspecs > 0){
 		my $missstr = join(',',@missingspecs);
 		my $d2cstr = "$leftanchor\_$rightanchor\t$missstr\t$mini\n";
@@ -594,7 +602,7 @@ else{
 
 	if($psnum > 0){
 	    	    #species: comma-separated in $psestr
-	    my @pmissingspecs = getMissingSpecs($psestr,$nwtree);
+	    my @pmissingspecs = getMissingSpecs($psestr,$nwtree,$errorfile);
 	    if(scalar @pmissingspecs > 0){
 		my $pmissstr = join(',',@pmissingspecs);
 		my $p2cstr = "$leftanchor\_$rightanchor\t$pmissstr\t$pmin\n";
@@ -775,6 +783,7 @@ sub getMissingSpecs{
     my @inp = @_;
     my $spstr = $inp[0];
     my $treefile = $inp[1];
+    my $errorfile = $inp[2];
 
     open TF,"<$treefile" or die "can't open $treefile\n";
     
@@ -793,7 +802,11 @@ sub getMissingSpecs{
     if(scalar @species <= 1){return @output;}
 
 
-    if($tree eq ""){print STDERR "createAlignments: tree format doesn't fit!\n"; exit 1;}
+    if($tree eq ""){
+	open(my $outerr,">>",$errorfile);
+	print $outerr "createAlignments: tree format doesn't fit!\n"; exit 1;
+	close $outerr;
+    }
     ##split the tree into an array of its elements
     my @T = (); ##tree with its components
     my @N = (); ##at each position there is a number showing opening brackets - closing brackets before this position, except for ( ) , ; then -2
@@ -841,7 +854,7 @@ sub getMissingSpecs{
     
     my $treestr = join('=',@T);
     my $leafbuitnotspecstr = join('=',@leafbutnospec);
-    my $lca = findLCA($treestr,$spstr);
+    my $lca = findLCA($treestr,$spstr,$errorfile);
     #lca is the id in T
     #check for all elements in leafbutnospec if lca is on their path to the root
     #if yes, put in output
@@ -859,7 +872,9 @@ sub getMissingSpecs{
     }
 
     my $outputstr = join('=',@output);
+
     return @output;
+    
 }
 
 
@@ -871,6 +886,8 @@ sub findLCA{
     #tree and leaf string is separated by =
     my @T = split '=', $inp[0];
     my @L = split ',', $inp[1]; #names of the species
+    my $errorfile = $inp[2];
+    open(my $outerr,">>",$errorfile);
     my @Ltmp = split ',', $inp[1];
     
     my @output = ();
@@ -880,7 +897,7 @@ sub findLCA{
     my @allleaves = ();
     my $brackets = 0;
     my $maxbracket = 0;
-    for(my $i = 0; $i < scalar @T; $i++)
+    for(my $i = 0;$i < scalar @T; $i++)
     {
 	if($T[$i] eq ')' || $T[$i] eq '(' || $T[$i] eq ',' || $T[$i] eq ';'){
 	    
@@ -970,7 +987,7 @@ sub findLCA{
 
 	my $pdiffstr = join('=',@pdiff);
 	if(scalar @pdiff == 0){
-	    print STDERR "error in createAlignments, findLCA; pathes: $pstr1; $pstr2\n";
+	    print $outerr "error in createAlignments, findLCA; pathes: $pstr1; $pstr2\n";
 	}
 	elsif(scalar @pdiff == 1){
 	    $curlca = $pdiff[0];
@@ -990,8 +1007,8 @@ sub findLCA{
     }
 
     if($N[$curlca] < 0){
-	print STDERR "createAlignments, findLCA: strange current LCA\n";
+	print $outerr "createAlignments, findLCA: strange current LCA\n";
     }
-
+    close $outerr;
     return $curlca;
 }

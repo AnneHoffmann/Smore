@@ -41,11 +41,11 @@ GetOptions(
     'cm|c=s' => \$cmfile,
     'genes=s' => \$genelist,
     'loci=s' => \$locilist,
-    'filter=s' => \$perc,
-    'incE=s' => \$evalin,
-    'incT=s' => \$bitvalin,
+    'filter=f' => \$perc,
+    'incE=f' => \$evalin,
+    'incT=f' => \$bitvalin,
     'infernal=s' => \$infernalpath,
-    'pseudo=s' => \$pseudoscore,
+    'pseudo=f' => \$pseudoscore,
     'err=s' => \$errors
     ) or die "Some parameter for smore prep doesn't fit! \n";
 
