@@ -238,7 +238,7 @@ foreach my $k (keys %blocks){
     my $filetoprint = "$alnfolder\/alignment$k\.aln";
 
     
-    my $alncmd = "perl $toolpath\/createAlignments_fast2.pl $tmpfile1 $outpath $toolpath $seqsim $strucsim $mode 0 $newicktree $leftanchor $rightanchor $del2check $pseudel2check $toprint $filetoprint 2>>$err";
+    my $alncmd = "perl $toolpath\/createAlignments_fast2.pl $tmpfile1 $outpath $toolpath $seqsim $strucsim $mode 0 $newicktree $leftanchor $rightanchor $del2check $pseudel2check $toprint $filetoprint $err 2>>$err";
     #before countEvents, check for deletions with the files created here
     #create alignment
     #my $alncmd = "perl $scriptpath\/createAlignments_fast.pl $tmpfile1 $outpath $pathtonw $seqsim $strucsim $mode 0 $nwtree $inpath\/temp $leftanchor $rightanchor";

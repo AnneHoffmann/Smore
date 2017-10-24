@@ -519,15 +519,15 @@ Tree:\n";
 print $outt "$tstr\n";
 
 #print diff numbers first here:
-print $outt "functional genes:\n";
-foreach my $dif (keys %numdiffs){
-    print $outt "$dif $numdiffs{$dif}\n";
-}
+#print $outt "functional genes:\n";
+#foreach my $dif (keys %numdiffs){
+#    print $outt "$dif $numdiffs{$dif}\n";
+#}
 
-print $outt "pseudogenes:\n";
-foreach my $pdif (keys %pnumdiffs){
-    print $outt "$pdif $pnumdiffs{$pdif}\n";
-}
+#print $outt "pseudogenes:\n";
+#foreach my $pdif (keys %pnumdiffs){
+#    print $outt "$pdif $pnumdiffs{$pdif}\n";
+#}
 
 
 close $outt;
