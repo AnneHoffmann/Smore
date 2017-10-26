@@ -1,0 +1,10 @@
+Wed Oct 25 16:42:10 2017 -- Program started 
+in roast mode.
+species list format checked!
+Tree file consistent with genomes!
+with parameter:  --out /homes/biertank/bsarah/Documents/projects/trnaevo/TestFastRun/sbRNAchrX/roast/output --tool /homes/biertank/bsarah/Documents/projects/trnaevo/pipeline/SMORE --perl /usr/local/bin --perl /usr/local/bin --in /homes/biertank/bsarah/Documents/projects/trnaevo/TestFastRun/sbRNAchrX/roast/input/allClusters_joined.txt --species /homes/biertank/bsarah/Documents/projects/trnaevo/TestFastRun/sbRNAchrX/roast/input/specieslist --newick /homes/biertank/bsarah/Documents/projects/trnaevo/TestFastRun/sbRNAchrX/roast/input/tree8species.newick
+
+Output files of SMORE roast can be found here: /homes/biertank/bsarah/Documents/projects/trnaevo/TestFastRun/sbRNAchrX/roast/output 
+To summarize all output files and finish the analysis, please use 'SMORE eat'.
+For more information on SMORE roast and SMORE eat, use 'SMORE --help' or 'SMORE --helpout' or check the manual.
+Wed Oct 25 16:42:30 2017 -- Program finished 

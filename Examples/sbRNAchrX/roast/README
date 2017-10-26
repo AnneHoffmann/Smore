@@ -1,0 +1,32 @@
+This is the README file for the SMORE roast run.
+
+This is a small example set including nematode tRNAs on chromosome X.
+
+This folder contains two subfolders, input and output. The output was created by calling SMORE roast on the input files.
+The programm call is the following:
+SMORE roast requires the output of SMORE prep and SMORE mix as input!
+
+SMORE roast --out output --in input/allClusters_joined.txt --species input/specieslist --newick input/tree8species.newick
+(This command is also written in the file commandlist in SMORE mix output.)
+
+The output folder contains several files. The files are listed in the following in several categories. The text in brackets gives a short description for each file. For more detailed information, we refer to the manual on www.github.de/AnneHoffmann/Smore
+
+The following output files are counts for the specific cluster list that was used as input. In case, several clusterlists are used, there will be a corresponding set of output files for each of them.
+Summary.txt (Summary of the run with running time and basic information about the input data.)
+errors_allClusters_joined.txt (List of errors that might have occured. If empty, no error occured.)
+
+The following output files are counts for the specific cluster list that was used as input. In case, several clusterlists are used, there will be a corresponding set of output files for each of them. The files are ALL needed for SMORE eat.
+delCheck_allClusters_joined.txt
+duplications_allClusters_joined.txt
+inremoldings_allClusters_joined.txt
+insertions_allClusters_joined.txt
+list_cographs_allClusters_joined.txt
+list_noncographs_allClusters_joined.txt
+matches_allClusters_joined.txt
+pseudelCheck_allClusters_joined.txt
+pseudoinsertions_allClusters_joined.txt
+pseudomatches_allClusters_joined.txt
+pseusingletons_allClusters_joined.txt
+remoldings_allClusters_joined.txt
+singletons_allClusters_joined.txt
+

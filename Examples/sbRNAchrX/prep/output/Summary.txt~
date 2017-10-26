@@ -1,0 +1,52 @@
+Wed Oct 25 16:21:22 2017 -- Program started 
+in bake mode.
+Bake mode is composed of SMORE prep and SMORE toast.
+Prep mode started at Wed Oct 25 16:21:22 2017 
+using a genelist with parameter:  --out /homes/biertank/bsarah/Documents/projects/trnaevo/TestFastRun/sbRNAchrX --tool /homes/biertank/bsarah/Documents/projects/trnaevo/pipeline/SMORE --perl /usr/local/bin --perl /usr/local/bin --maf /homes/biertank/bsarah/Documents/projects/trnaevo/TestFastRun/data_cel --ref ce11 --genes /scr/k61san/trnaevo/CMs/sbRNAs/Analysis/Infernal/sbRNAs_chrX.bed
+gene list format checked!
+
+Prep mode finished at Wed Oct 25 16:22:55 2017 
+Toast mode started at Wed Oct 25 16:22:55 2017 
+species list format checked!
+Tree file consistent with genomes!
+with smore-toast-specific parameter:  --prep /homes/biertank/bsarah/Documents/projects/trnaevo/TestFastRun/sbRNAchrX --newick /homes/biertank/bsarah/Documents/projects/trnaevo/TestFastRun/tree8species.newick --join relaxed
+Number of species: 7 
+Number of different element types: 1 
+Number of original clusters: 19 
+The following numbers show the maximal, minimal and average distances between
+elements in original clusters for each species (counted in nt).
+species	maxdist	mindist	average	num_of_counted_clusters
+caePb3	13894	80	2470.33	6
+caeJap4	0	0	0	0
+ce11	96	83	87.75	4
+haeCon2	0	0	0	0
+priPac3	3836	64	1950.00	2
+cb4	5888	91	2175.00	3
+caeRem4	50755	88	10236.80	5
+Average number of elements of original clusters: 1.79 
+Number of joined clusters: 14 
+The following numbers show the maximal, minimal and average distances between
+elements in joined clusters for each species (counted in nt).
+species	maxdist	mindist	average	num_of_counted_clusters
+caePb3	595835	80	149155.50	4
+caeJap4	0	0	0	0
+ce11	986	83	388.33	3
+haeCon2	0	0	0	0
+priPac3	738513	738513	738513.00	1
+cb4	122071	5888	63979.50	2
+caeRem4	50755	88	10236.80	5
+Average number of elements per cluster in joined cluster: 2.43
+
+Information on graph structures and corrections:
+Number of cographs 8, with on average
+0.25 nodes, 0.00 edges and a density of 0.00.
+Number of non-cographs 0, with on average
+0 nodes, 0 edges and a density of 0.
+All non-cographs were corrected to obtain a cograph structure.
+
+
+Finished toast mode at Wed Oct 25 16:23:12 2017 
+Output files of SMORE bake can be found here: /homes/biertank/bsarah/Documents/projects/trnaevo/TestFastRun/sbRNAchrX 
+The final tree can be visualized using the online tool iTOL. Files to be uploaded on the iTOL page are located in /homes/biertank/bsarah/Documents/projects/trnaevo/TestFastRun/sbRNAchrX/data_iTOL
+For more information on SMORE bake output, use 'SMORE --helpout' or check the manual.
+Wed Oct 25 16:23:12 2017 -- Program finished 

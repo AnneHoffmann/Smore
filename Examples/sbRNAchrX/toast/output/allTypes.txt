@@ -1,0 +1,7 @@
+caeRem4_sbRNAs	18
+ce11_sbRNAs	4
+cb4_sbRNAs	6
+priPac3_sbRNAs	6
+caePb3_sbRNAs	15
+caeJap4_sbRNAs	1
+haeCon2_sbRNAs	1

@@ -1,0 +1,8 @@
+# User provided genes
+# Created on 25/10/2017 (day/month/year)
+Ppa_Contig101	priPac3_29	247117	247201	+	118652	None	::.....:::::::<<<<<-<<-<<<<<<<<<_____________________________________________>>-->>>>>>>------->>->>>>>::::::.:::....::::	ACagaacAG--UCAAGGUCCGGAGUCUAUGGGUUACCAAG--------------------C-----AAA----CCCUCC--CAUAGGCAU--CAACUUGACCUGUCUGUu-UUgcagUUUU	sbRNAs	FALSE	NA
+Ppa_Contig2	priPac3_30	1407207	1407143	-	85482	140180	:::::::::<<<<<-<<-<<<<<<<<<_______~~~~~~>>-->>>>>>>------->>->>>>>:::::::::::::	UC------AAGGUCCGGAGUCGAUGGGUUAUCAG*[6]*CC--CACCGACAU--CAACUUGACCUG---G-CUGUUUU	sbRNAs	FALSE	NA
+Ppa_Contig34	priPac3_33	668768	668694	-	100981	154081	:::::::::<<<<<-<<-<<<<<<<<<_____________________________________________>>-->>>>>>>------->>->>>>>:::::::::.::::	U---UGUCAAGGUCCGGAGUCUAUGGGUUACCUCUG-------------------------AAU----CUCUCC--CAUAGACAU--CAACUUGACCUGACUUUUUGcUUU-	sbRNAs	FALSE	NA
+Ppa_Contig34	priPac3_31	669174	669089	-	100981	154081	::..:::::::<<<<<-<<-<<<<<<<<<_____________________________________________>>-->>>>>>>------->>->>>>>:::::::::::::	UAuaAG-AAUAAGGUCCGGAGCUUAUGGGUUAUCAAAUCUCA-------------UUG-----AAC----CCCUCC--CAUAGGCAU--UCACUCGACCUGACUUUUUGUUUU	sbRNAs	FALSE	NA
+Ppa_Contig34	priPac3_32	671722	671640	-	100981	154081	:::::::::<<<<<-<<-<<<<<<<<<_____________________________________________>>-->>>>>>>------->>->>>>>:::::::::::::	U--GUGUCAAGGUCCGGAGCUUAUGGGUUAUCAAAUCUCA-------------UUG-----AAC----CCCUCC--CAUAGGCAU--UCACUCGACCUGACUUUUUGUUUU	sbRNAs	FALSE	NA
+Ppa_Contig34	priPac3_34	672530	672449	-	100981	154081	::.....:::::::<<<<<-<<-<<<<<<<<<___________~~~~~~>>-->>>>>>>------->>->>>>>:::::::::::::	UCagaacAG--UCAAGGUCCGGAGUCUGUGGGUUAUGAU--UU*[12]*CC--CACAGACAU--CAACUUGACCUGGU----UGUUUU	sbRNAs	FALSE	NA

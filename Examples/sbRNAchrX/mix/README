@@ -1,0 +1,25 @@
+This is the README file for the SMORE mix run.
+
+This is a small example set including nematode tRNAs on chromosome X.
+
+This folder contains two subfolders, input and output. The output was created by calling SMORE mix on the input files.
+The programm call is the following:
+SMORE mix requires the output of SMORE prep as input!
+
+SMORE mix --out output --prep input --species input/specieslist --newick input/tree8species.newick
+
+The output folder contains several files. The files are listed in the following in several categories. The text in brackets gives a short description for each file. For more detailed information, we refer to the manual on www.github.de/AnneHoffmann/Smore
+
+
+The output folder contains the following files (some of them will be needed for further runs of SMORE subcommand such as SMORE roast.):
+Summary.txt (Summary of the run with running time and basic information about the input data.)
+errors_smoremix.txt (List of errors that might have occured. If empty, no error occured.)
+allClusters_joined.txt (List of original clusters, hence the cluster number together with all its elements. Needed for SMORE roast. This might include several cluster list, depending on the number of clusters.)
+allClusters_original.txt (List of joined clusters, hence the cluster number together with all its elements.)
+commandlist.txt (List of commands to be run when starting SMORE roast on the data. This might include several commands in case the number of clusters is too high.)
+allTypes.txt (List of types of functional genes that were included during the analysis.)
+allPseudoTypes.txt (List of types of pseudogenes that were included during the analysis.)
+nones.txt (Counts for functional genes without anchors.)
+pseunones.txt (Counts for pseudogenes without anchors.)
+specieslist (List of species, needed for SMORE roast.)
+

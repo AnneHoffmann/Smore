@@ -1,0 +1,3 @@
+caeRem4_sbRNAs	3
+ce11_sbRNAs	1
+caePb3_sbRNAs	2

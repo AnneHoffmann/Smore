@@ -1,0 +1,17 @@
+Wed Oct 25 16:46:37 2017 -- Program started 
+species list format checked!
+Tree file consistent with genomes!
+with parameter:  --out /homes/biertank/bsarah/Documents/projects/trnaevo/TestFastRun/sbRNAchrX/eat/output --tool /homes/biertank/bsarah/Documents/projects/trnaevo/pipeline/SMORE --perl /usr/local/bin --perl /usr/local/bin --prep /homes/biertank/bsarah/Documents/projects/trnaevo/TestFastRun/sbRNAchrX/eat/input/prep_input --mix /homes/biertank/bsarah/Documents/projects/trnaevo/TestFastRun/sbRNAchrX/eat/input/mix_input --roast /homes/biertank/bsarah/Documents/projects/trnaevo/TestFastRun/sbRNAchrX/eat/input/roast_input --newick /homes/biertank/bsarah/Documents/projects/trnaevo/TestFastRun/sbRNAchrX/eat/input/tree8species.newick
+
+Information on graph structures and corrections:
+Number of cographs 8, with on average
+0.25 nodes, 0.00 edges and a density of 0.00.
+Number of non-cographs 0, with on average
+0 nodes, 0 edges and a density of 0.
+All non-cographs were corrected to obtain a cograph structure.
+
+
+Output files of SMORE eat can be found here: /homes/biertank/bsarah/Documents/projects/trnaevo/TestFastRun/sbRNAchrX/eat/output 
+The final tree can be visualized using the online tool iTOL. Files to be uploaded on the iTOL page are located in /homes/biertank/bsarah/Documents/projects/trnaevo/TestFastRun/sbRNAchrX/eat/output/data_iTOL
+For more information on SMORE eat, use 'SMORE --help' or 'SMORE --helpout' or check the manual.
+Wed Oct 25 16:46:53 2017 -- Program finished 

@@ -1,0 +1,53 @@
+This is the README file for the SMORE toast run.
+
+This is a small example set including nematode tRNAs on chromosome X.
+
+This folder contains two subfolders, input and output. The output was created by calling SMORE toast on the input files.
+The programm call is the following:
+SMORE toast requires the output of SMORE prep as input!
+
+SMORE toast --out output --prep input --newick input/tree8species.newick
+
+The output folder contains several files. The files are listed in the following in several categories. The text in brackets gives a short description for each file. For more detailed information, we refer to the manual on www.github.de/AnneHoffmann/Smore
+
+The output contains the following main output files:
+Summary.txt (Summary of the run with running time and basic information about the input data.)
+OutTree.txt (The final tree in newick format with labels at the inner nodes containing the event counts.)
+errors_smoreprep.txt (List of errors that might have occured. If empty, no error occured.)
+errors_smoretoast.txt (List of errors that might have occured. If empty, no error occured.)
+allClusters_joined.txt (List of original clusters, hence the cluster number together with all its elements.)
+allClusters_original.txt (List of joined clusters, hence the cluster number together with all its elements.)
+specieslist (List of species)
+list_genesfiles (List of files in genes folder)
+
+The output folder contains the following additional output files:
+allTypes.txt (List of types of functional genes that were included during the analysis.)
+allPseudoTypes.txt (List of types of pseudogenes that were included during the analysis.)
+geneticEvents.txt (List of counts for genetic events as depicted in the tree, too.)
+list_cographs.txt (List of graphs that have a cograph structure.)
+list_noncographs.txt (List of graphs that do not have a cograph structure and needed to be edited.)
+remoldings.txt (Elements that have the same type but a low similarity score.)
+inremoldings.txt (Elements that have different types but a high similarity score.)
+The following are list about counts of evolutionary events for functional and pseudo genes. These files are used to summarize the counts at the tree.
+singletons.txt
+pseusingletons.txt
+deletions.txt 
+pseudodeletions.txt
+duplications.txt
+insertions.txt
+pseudoinsertions.txt
+matches.txt
+pseudomatches.txt
+missinganchors.txt
+pseudomissing.txt
+nones.txt
+pseunones.txt
+
+
+The output contains the following subfolders:
+data_iTOL (This folder includes files that can be used to visualize the output tree. On http://itol.embl.de/upload.cgi the file F0tree.txt can be downloaded. All other files can be added by drag-and-drop in order to visualize the tree and all its numbers. The tree can be edited and downloaded in different formats.)
+
+Using the files in data_iTOL on http://itol.embl.de/upload.cgi,
+the final tree can be visualized and edited. The following files provide examples based on the example data set:
+sbRNA8chrXbake.pdf
+sbRNA8chrXbake.svg

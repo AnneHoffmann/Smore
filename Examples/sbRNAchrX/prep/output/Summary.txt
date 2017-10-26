@@ -1,0 +1,6 @@
+Wed Oct 25 16:21:22 2017 -- Program started 
+in prep mode
+using a genelist with parameter:  --out /homes/biertank/bsarah/Documents/projects/trnaevo/TestFastRun/sbRNAchrX --tool /homes/biertank/bsarah/Documents/projects/trnaevo/pipeline/SMORE --perl /usr/local/bin --perl /usr/local/bin --maf /homes/biertank/bsarah/Documents/projects/trnaevo/TestFastRun/data_cel --ref ce11 --genes /scr/k61san/trnaevo/CMs/sbRNAs/Analysis/Infernal/sbRNAs_chrX.bed
+gene list format checked!
+
+Prep mode finished at Wed Oct 25 16:22:55 2017 

@@ -1,0 +1,125 @@
+tree: (priPac3,(melInc2,(haeCon2,((caePb3,(caeJap4,ce11)InnerNode3)InnerNode2,(caeRem4,cb4)InnerNode1)Caenorhabditis)Rhabditida)InnerNode0)Chromadorea; 
+The following output shows the number of events that occur at the specified node in the tree.
+Thus, summary for each event is a tab separated table with: tree_node number_of_events
+Events are Insertion, Deletion, Duplication, Pseudogenization if chosen at the beginning.
+
+
+EVENT: Insertion
+Caenorhabditis	0(0)
+Chromadorea	0(0)
+InnerNode0	0(0)
+InnerNode1	0(0)
+InnerNode2	0(0)
+InnerNode3	0(0)
+Rhabditida	0(0)
+caeJap4	0(0)
+caePb3	10(0)
+caeRem4	4(0)
+cb4	6(0)
+ce11	3(0)
+haeCon2	0(0)
+melInc2	0(0)
+priPac3	5(0)
+
+
+EVENT: Deletion
+Caenorhabditis	0(0)
+Chromadorea	0(0)
+InnerNode0	0(0)
+InnerNode1	0(0)
+InnerNode2	0(0)
+InnerNode3	0(0)
+Rhabditida	0(0)
+caeJap4	0(0)
+caePb3	0(0)
+caeRem4	0(0)
+cb4	0(0)
+ce11	0(0)
+haeCon2	0(0)
+melInc2	0(0)
+priPac3	0(0)
+
+
+EVENT: Duplication
+Caenorhabditis	0
+Chromadorea	0
+InnerNode0	0
+InnerNode1	0
+InnerNode2	0
+InnerNode3	0
+Rhabditida	0
+caeJap4	0
+caePb3	0
+caeRem4	0
+cb4	0
+ce11	0
+haeCon2	0
+melInc2	0
+priPac3	0
+
+
+EVENT: Singletons
+Caenorhabditis	0(0)
+Chromadorea	0(0)
+InnerNode0	0(0)
+InnerNode1	0(0)
+InnerNode2	0(0)
+InnerNode3	0(0)
+Rhabditida	0(0)
+caeJap4	0(0)
+caePb3	2(0)
+caeRem4	3(0)
+cb4	0(0)
+ce11	1(0)
+haeCon2	0(0)
+melInc2	0(0)
+priPac3	0(0)
+
+
+EVENT: No Anchors Beginning
+Caenorhabditis	0(0)
+Chromadorea	0(0)
+InnerNode0	0(0)
+InnerNode1	0(0)
+InnerNode2	0(0)
+InnerNode3	0(0)
+Rhabditida	0(0)
+caeJap4	1(0)
+caePb3	3(0)
+caeRem4	11(0)
+cb4	0(0)
+ce11	0(0)
+haeCon2	1(0)
+melInc2	0(0)
+priPac3	1(0)
+
+
+EVENT: No Anchors Inbetween
+Caenorhabditis	0(0)
+Chromadorea	0(0)
+InnerNode0	0(0)
+InnerNode1	0(0)
+InnerNode2	0(0)
+InnerNode3	0(0)
+Rhabditida	0(0)
+caeJap4	0(0)
+caePb3	0(0)
+caeRem4	0(0)
+cb4	0(0)
+ce11	0(0)
+haeCon2	0(0)
+melInc2	0(0)
+priPac3	0(0)
+
+
+CHECK: Differences between total numbers and sum of events
+caeJap4	0(0)
+caePb3	0(0)
+caeRem4	0(0)
+cb4	0(0)
+ce11	0(0)
+haeCon2	0(0)
+melInc2	0(0)
+priPac3	0(0)
+
+

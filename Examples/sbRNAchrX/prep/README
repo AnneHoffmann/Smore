@@ -1,0 +1,19 @@
+This is the README file for the SMORE prep run.
+
+This is a small example set including nematode tRNAs on chromosome X.
+
+This folder contains two subfolders, input and output. The output was created by calling SMORE prep on the input files.
+The programm call is the following:
+
+SMORE prep --out output --maf input/data_cel --genes input/sbRNAs_chrX.bed --ref ce11
+
+The output folder contains several files. The files are listed in the following in several categories. The text in brackets gives a short description for each file. For more detailed information, we refer to the manual on www.github.de/AnneHoffmann/Smore
+
+The output contains the following main output files:
+Summary.txt (Summary of the run with running time and basic information about the input data.)
+errors_smoreprep.txt (List of errors that might have occured. If empty, no error occured.)
+
+The output contains the following subfolders:
+genes (Files that are needed to create the clusters. Needed for later subcommands such as SMORE toast or SMORE mix.)
+temp (Files that are needed to check for missing anchors. Needed for later subcommands such as SMORE toast or SMORE mix.)
+bed (Files that are needed to create the clusters. Needed for later subcommands such as SMORE toast or SMORE mix.)

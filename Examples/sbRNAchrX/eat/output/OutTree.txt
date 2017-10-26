@@ -1,0 +1,15 @@
+Newick tree with numbers specifying event counts at its nodes.
+Each node name contains the following numbers in event specification:
+[ta(p)|ib(p)|lc(p)|dx|se(p)|nz(p)|mf(p)] where:
+a are total number of elements,
+b are insertions,
+c are deletions, thus losses, 
+x are duplications,
+e are singletons, 
+p are the pseudogenes from this category
+z are the elements that were excluded from the analysis.
+
+f is the number of elements that were excluded from the analysis because of missing anchors
+
+Tree:
+(priPac3[t6(0)|i5(0)|l0(0)|d0|s0(0)|n1(0)|m0(0)],(melInc2[t0(0)|i0(0)|l0(0)|d0|s0(0)|n0(0)|m0(0)],(haeCon2[t1(0)|i0(0)|l0(0)|d0|s0(0)|n1(0)|m0(0)],((caePb3[t15(0)|i10(0)|l0(0)|d0|s2(0)|n3(0)|m0(0)],(caeJap4[t1(0)|i0(0)|l0(0)|d0|s0(0)|n1(0)|m0(0)],ce11[t4(0)|i3(0)|l0(0)|d0|s1(0)|n0(0)|m0(0)])InnerNode3[t0(0)|i0(0)|l0(0)|d0|s0(0)|n0(0)|m0(0)])InnerNode2[t0(0)|i0(0)|l0(0)|d0|s0(0)|n0(0)|m0(0)],(caeRem4[t18(0)|i4(0)|l0(0)|d0|s3(0)|n11(0)|m0(0)],cb4[t6(0)|i6(0)|l0(0)|d0|s0(0)|n0(0)|m0(0)])InnerNode1[t0(0)|i0(0)|l0(0)|d0|s0(0)|n0(0)|m0(0)])Caenorhabditis[t0(0)|i0(0)|l0(0)|d0|s0(0)|n0(0)|m0(0)])Rhabditida[t0(0)|i0(0)|l0(0)|d0|s0(0)|n0(0)|m0(0)])InnerNode0[t0(0)|i0(0)|l0(0)|d0|s0(0)|n0(0)|m0(0)])Chromadorea[t0(0)|i0(0)|l0(0)|d0|s0(0)|n0(0)|m0(0)];

@@ -98,26 +98,28 @@ while(<FA>){
     $spec2numdist{$spec} = 0;
     $pseuspecies{$spec} = 0;
     #sort file and remove blanks
-    my $curfile_nb = "$outpath\/$spec\_nb\.bed";
-    my $curfile_sorted = "$outpath\/$spec\_sorted\.bed";
-    my $cmdnoblanks = "awk \'NF\' $curfile \> $curfile_nb";
+#    my $curfile_nb = "$outpath\/$spec\_nb\.bed";
+#    my $curfile_sorted = "$outpath\/$spec\_sorted\.bed";
+#    my $curfile_sorteduniq = "$outpath\/$spec\_sorteduniq\.bed";
+#    my $cmdnoblanks = "awk \'NF\' $curfile \> $curfile_nb";
     #sort by chr, elemstart, elemend
-    my $col1 = 1;
-    my $col3 = 3;
-    my $col4 = 4;
-    my $coln = "n";
-    my $cmdsort = "sort -k$col1,$col1 -k$col3,$col3$coln -k$col4,$col4$coln $curfile_nb \> $curfile_sorted";
+#    my $col1 = 1;
+#    my $col3 = 3;
+#    my $col4 = 4;
+#    my $coln = "n";
+#    my $cmdsort = "sort -k$col1,$col1 -k$col3,$col3$coln -k$col4,$col4$coln $curfile_nb \> $curfile_sorted";
+#    my $cmduniq = "uniq $curfile_sorted > $curfile_sorteduniq";
 #    print STDERR "SORT: $cmdsort \n";
-    readpipe("$cmdnoblanks");
-    readpipe("$cmdsort");
-
+#    readpipe("$cmdnoblanks");
+#    readpipe("$cmdsort");
+#    readpipe("$cmduniq");
     #this describes the neighbors
     my $chr2 = "-1";
     my $bl2 = "-1";
     my $chr1 = "-1";
     my $bl1 = "-1";
     #read file to blocks/nones
-    open CF, "<$curfile_sorted" or die "can't open $curfile_sorted\n";
+    open CF, "<$curfile" or die "can't open $curfile\n";
     while(<CF>){
 	chomp;
 	my $line = $_;
@@ -311,7 +313,11 @@ elements in original clusters for each species (counted in nt).\n";
 print "species\tmaxdist\tmindist\taverage\tnum_of_counted_clusters\n";
 #calculate average distances
 foreach my $t (keys %spec2numdist){
-    my $avdist = sprintf "%.2f",$spec2sumdist{$t}/$spec2numdist{$t};
+    my $avdist = 0;
+    if($spec2numdist{$t}>0){
+	$avdist = sprintf "%.2f",$spec2sumdist{$t}/$spec2numdist{$t};
+    }
+    if($spec2mindist{$t}==1000000){$spec2mindist{$t} = 0;}
     print "$t\t$spec2maxdist{$t}\t$spec2mindist{$t}\t$avdist\t$spec2numdist{$t}\n";
     #reset the hashes in order to use it for joined clusters
     $spec2maxdist{$t} = 0;
@@ -495,8 +501,8 @@ foreach my $bk (keys %blocks){
     }
 }
 close $outjc;
-
-my $origavsize = sprintf "%.2f",$sumelemorig/$orignum;
+my $origavsize=0;
+if($orignum>0){$origavsize = sprintf "%.2f",$sumelemorig/$orignum;}
 print "Average number of elements of original clusters: $origavsize \n";
 
 my $newclusnum = 0;
@@ -527,7 +533,11 @@ elements in joined clusters for each species (counted in nt).\n";
     print "species\tmaxdist\tmindist\taverage\tnum_of_counted_clusters\n";
     #calculate average distances
     foreach my $t (keys %spec2numdist){
-	my $avdist = sprintf "%.2f",$spec2sumdist{$t}/$spec2numdist{$t};
+	my $avdist = 0;
+	if($spec2numdist{$t}>0){
+	    $avdist = sprintf "%.2f",$spec2sumdist{$t}/$spec2numdist{$t};
+	}
+	if($spec2mindist{$t}==1000000){$spec2mindist{$t} = 0;}
 	print "$t\t$spec2maxdist{$t}\t$spec2mindist{$t}\t$avdist\t$spec2numdist{$t}\n";
 	#reset the hashes 
 	$spec2maxdist{$t} = 0;
@@ -607,8 +617,8 @@ if($joined==1){
 	    if($printc || $printall){print $outcf "$B[$cb]\n";}
 	}
     }
-        
-    my $avnum = sprintf "%.2f",$sumelems/$cluscount;
+    my $avnum=0;
+    if($cluscount>0){$avnum = sprintf "%.2f",$sumelems/$cluscount;}
     print "Average number of elements per cluster: $avnum\n";
 }
 

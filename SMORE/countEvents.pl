@@ -370,13 +370,14 @@ for(my $gt=0;$gt < scalar @GT; $gt++){
     $totnumbers{$HT[0]} = $HT[1];
 }
 
-my @GTP = split '=', $allT[1];
-for(my $gtp=0;$gtp < scalar @GTP; $gtp++){
-    if($GTP[$gtp] eq ""){next;}
-    my @HTP = split '-', $GTP[$gtp];
-    $totpseudos{$HTP[0]} = $HTP[1];
+if(scalar @allT > 1){
+    my @GTP = split '=', $allT[1];
+    for(my $gtp=0;$gtp < scalar @GTP; $gtp++){
+	if($GTP[$gtp] eq ""){next;}
+	my @HTP = split '-', $GTP[$gtp];
+	$totpseudos{$HTP[0]} = $HTP[1];
+    }
 }
-
 
 
 

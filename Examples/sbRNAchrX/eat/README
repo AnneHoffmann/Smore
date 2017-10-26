@@ -1,0 +1,47 @@
+This is the README file for the SMORE eat run.
+
+This is a small example set including nematode tRNAs on chromosome X.
+
+This folder contains two subfolders, input and output. The output was created by calling SMORE eat on the input files.
+The programm call is the following:
+SMORE eat requires the output of SMORE prep, SMORE mix and SMORE roast as input!
+
+SMORE eat --out output --prep input/prep_input --mix input/mix_input --roast input/roast_input --newick input/tree8species.newick
+
+The output folder contains several files. The files are listed in the following in several categories. The text in brackets gives a short description for each file. For more detailed information, we refer to the manual on www.github.de/AnneHoffmann/Smore
+
+The output contains the following main output files:
+Summary.txt (Summary of the run with running time and basic information about the input data.)
+OutTree.txt (The final tree in newick format with labels at the inner nodes containing the event counts.)
+errors_smoreeat.txt (List of errors that might have occured. If empty, no error occured.)
+errors (List of errors that might have occured. If empty, no error occured.)
+
+
+The output folder contains the following additional output files:
+geneticEvents.txt (List of counts for genetic events as depicted in the tree, too.)
+list_allcographs.txt (List of graphs that have a cograph structure.)
+list_allnoncographs.txt (List of graphs that do not have a cograph structure and needed to be edited.)
+remoldings.txt (Elements that have the same type but a low similarity score.)
+inremoldings.txt (Elements that have different types but a high similarity score.)
+The following are list about counts of evolutionary events for functional and pseudo genes. These files are used to summarize the counts at the tree.
+singletons.txt
+pseusingletons.txt
+deletions.txt 
+pseudodeletions.txt
+duplications.txt
+insertions.txt
+pseudoinsertions.txt
+matches.txt
+pseudomatches.txt
+missinganchors.txt
+pseudomissing.txt
+
+
+
+The output contains the following subfolders:
+data_iTOL (this folder includes files that can be used to visualize the output tree. On http://itol.embl.de/upload.cgi the file F0tree.txt can be downloaded. All other files can be added by drag-and-drop in order to visualize the tree and all its numbers. The tree can be edited and downloaded in different formats.)
+
+Using the files in data_iTOL on http://itol.embl.de/upload.cgi,
+the final tree can be visualized and edited. The following files provide examples based on the example data set:
+sbRNA8chrXbake.pdf
+sbRNA8chrXbake.svg

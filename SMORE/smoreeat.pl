@@ -555,3 +555,7 @@ print "Number of non-cographs $ncggraphnum, with on average\n";
 print "$avncgnodenum nodes, $avncgedgenum edges and a density of $avncgdensity.\n";
 print "All non-cographs were corrected to obtain a cograph structure.\n";
 print "\n";
+
+#remove intermediary files
+my $rmallcmd = "rm $tmpfilelist $delchecklist $pdelchecklist $dupllist $matlist $pmatlist $inslist $pinslist $sinlist $psinlist $cglist $ncglist";
+readpipe("$rmallcmd");

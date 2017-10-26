@@ -1,0 +1,6 @@
+# User provided genes
+# Created on 25/10/2017 (day/month/year)
+chrX	ce11_7	14476861	14476957	+	208794	208795	::.:::::::<<<<<-<<-<<<<<<<<<_____________________________.._.____..___________>>-->>>>>>>------->>->>>>>::::::.:::....::::	ACcCGUGUCUCGGUCCGGCGUCAGUGGGUUAUCGUAUUU------------C----UcuCcCUUCggGGA----AUUUCC--CAUCGGCAU--CAACUUGACCGUUGCGUu-UUgaaaUUUU	sbRNAs	FALSE	NA
+chrX	ce11_10	14477195	14477278	+	208807	208808	:::::::::<<<<<-<<-<<<<<<<<<_____________________________.._.____..___________>>-->>>>>>>------->>->>>>>:::::::::::::	U----GUAUCGGUCCGGCGUCAGUGGGUUAUCAAGUUUGC----------------cuCcCUUCggGGA----AUUUCC--CAUCGGCAU--CAACUUGACAGU-UACA---UUUU	sbRNAs	FALSE	NA
+chrX	ce11_9	14477544	14477633	+	208817	208818	:::::::::<<<<<-<<-<<<<<<<<<_____________________________________________>>-->>>>>>>------->>->>>>>:::::::::...::::	U----GUAUCGGUCCGGCGUCAGUGGGUUAUCAAGUUUGC-------CUCCCUUCG-----GGA----AUUUCU--CAUCGGCAC--CAACUUGACCGUUGCUUUUGaaaUUUU	sbRNAs	FALSE	NA
+chrX	ce11_8	14478447	14478530	+	208823	208824	:::::::::<<<<<-<<-<<<<<<<<<_________________________._____.____..___________>>-->>>>>>>------->>->>>>>:::::::::::::	U----AUAUCGGUCCGGCGCCAAUAGGUUAUCAUUCCU---------AUUCCc-----aCUUCagGGA----ACUUCC--CAUUGGCAC--CAACUUGACUGA---UA--UUUUU	sbRNAs	FALSE	NA
